@@ -1,6 +1,6 @@
 [package]
 name = "ask433"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 authors = ["Annie Ehler <annie.ehler.4@gmail.com>"]
 license = "MIT OR Apache-2.0"
@@ -9,7 +9,6 @@ repository = "https://github.com/annie444/ask433"
 description = "A no_std, embedded-hal ASK/OOK modem driver for 433 MHz RF modules (e.g., FS1000A). Supports RX/TX, 4b6b encoding, and software PLL demodulation."
 categories = ["embedded", "hardware-support", "no-std"]
 documentation = "https://docs.rs/ask433"
-rust-version = "1.86"
 keywords = ["hal", "IO"]
 
 [features]

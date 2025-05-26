@@ -1,0 +1,39 @@
+[package]
+name = "ask443"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+std = []
+delayus-loop = []
+timer-isr = ["dep:critical-section"]
+defmt = [
+  "dep:defmt",
+  "embedded-hal/defmt-03",
+  "heapless/defmt-03",
+  "nb/defmt-0-3",
+]
+log = ["dep:log"]
+default = ["timer-isr", "dep:heapless"]
+
+[dependencies]
+embedded-hal = "1.0.0"
+
+# defmt feature
+defmt = { version = "1.0.1", optional = true }
+# log feature
+log = { version = "0.4.27", optional = true, default-features = false }
+# timer-isr feature
+critical-section = { version = "1.2.0", optional = true }
+# no-std feature
+heapless = { version = "0.8.0", optional = true }
+libm = "0.2.15"
+nb = "1.1.0"
+lazy_static = "1.5.0"
+
+[dependencies.radio]
+optional = true
+git = "https://github.com/annie444/radio-hal"
+
+[dev-dependencies]
+embedded-hal-mock = "0.11.1"

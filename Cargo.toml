@@ -35,9 +35,5 @@ libm = "0.2.15"
 nb = "1.1.0"
 lazy_static = "1.5.0"
 
-[dependencies.radio]
-optional = true
-git = "https://github.com/annie444/radio-hal"
-
 [dev-dependencies]
 embedded-hal-mock = "0.11.1"

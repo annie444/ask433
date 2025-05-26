@@ -48,7 +48,10 @@ macro_rules! init_ask_driver {
 /// - Requires `init_ask_driver!` to have been used earlier.
 #[macro_export]
 macro_rules! setup_ask_driver {
-    ( $tx:ident, $rx:ident, $ptt:ident, $tpb:ident, $ptt_inverted:ident, $rx_inverted:ident ) => {
+    // The arrays below signify the pattern for [$ptt, $ticks_per_bit, $ptt_inverted, $rx_inverted]
+    // such that `:ident` == 0 and `:literal` == 1
+    // [0, 0, 0, 0]
+    ( $tx:ident, $rx:ident, $ptt:ident, $ticks_per_bit:ident, $ptt_inverted:ident, $rx_inverted:ident ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -56,13 +59,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:literal, $tpb:ident, $ptt_inverted:ident, $rx_inverted:ident ) => {
+    // [1, 0, 0, 0]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:ident, $ptt_inverted:ident, $rx_inverted:ident ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -70,13 +74,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:literal, $tpb:literal, $ptt_inverted:ident, $rx_inverted:ident ) => {
+    // [1, 1, 0, 0]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:literal, $ptt_inverted:ident, $rx_inverted:ident ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -84,13 +89,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:literal, $tpb:literal, $ptt_inverted:literal, $rx_inverted:ident ) => {
+    // [1, 1, 1, 0]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:literal, $ptt_inverted:literal, $rx_inverted:ident ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -98,13 +104,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:literal, $tpb:literal, $ptt_inverted:literal, $rx_inverted:literal ) => {
+    // [1, 1, 1, 1]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:literal, $ptt_inverted:literal, $rx_inverted:literal ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -112,13 +119,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:ident, $tpb:ident, $ptt_inverted:ident, $rx_inverted:literal ) => {
+    // [0, 0, 0, 1]
+    ( $tx:ident, $rx:ident, $ptt:ident, $ticks_per_bit:ident, $ptt_inverted:ident, $rx_inverted:literal ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -126,13 +134,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:ident, $tpb:ident, $ptt_inverted:literal, $rx_inverted:literal ) => {
+    // [0, 0, 1, 1]
+    ( $tx:ident, $rx:ident, $ptt:ident, $ticks_per_bit:ident, $ptt_inverted:literal, $rx_inverted:literal ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -140,13 +149,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:ident, $tpb:literal, $ptt_inverted:literal, $rx_inverted:literal ) => {
+    // [0, 1, 1, 1]
+    ( $tx:ident, $rx:ident, $ptt:ident, $ticks_per_bit:literal, $ptt_inverted:literal, $rx_inverted:literal ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -154,13 +164,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:ident, $tpb:literal, $ptt_inverted:ident, $rx_inverted:literal ) => {
+    // [0, 1, 0, 1]
+    ( $tx:ident, $rx:ident, $ptt:ident, $ticks_per_bit:literal, $ptt_inverted:ident, $rx_inverted:literal ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -168,13 +179,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:literal, $tpb:ident, $ptt_inverted:literal, $rx_inverted:ident ) => {
+    // [1, 0, 1, 0]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:ident, $ptt_inverted:literal, $rx_inverted:ident ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -182,13 +194,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:literal, $tpb:ident, $ptt_inverted:ident, $rx_inverted:literal ) => {
+    // [1, 0, 0, 1]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:ident, $ptt_inverted:ident, $rx_inverted:literal ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -196,13 +209,14 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));
         });
     };
-    ( $tx:ident, $rx:ident, $ptt:ident, $tpb:literal, $ptt_inverted:literal, $rx_inverted:ident ) => {
+    // [0, 1, 1, 0]
+    ( $tx:ident, $rx:ident, $ptt:ident, $ticks_per_bit:literal, $ptt_inverted:literal, $rx_inverted:ident ) => {
         $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
@@ -210,7 +224,37 @@ macro_rules! setup_ask_driver {
                     $tx,
                     $rx,
                     $ptt,
-                    $tbp,
+                    $ticks_per_bit,
+                    $ptt_inverted,
+                    $rx_inverted,
+                )));
+        });
+    };
+    // [1, 0, 1, 1]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:ident, $ptt_inverted:literal, $rx_inverted:literal ) => {
+        $crate::critical_section::with(|cs| {
+            ASK_DRIVER
+                .borrow(cs)
+                .replace(Some($crate::driver::AskDriver::new(
+                    $tx,
+                    $rx,
+                    $ptt,
+                    $ticks_per_bit,
+                    $ptt_inverted,
+                    $rx_inverted,
+                )));
+        });
+    };
+    // [1, 1, 0, 1]
+    ( $tx:ident, $rx:ident, $ptt:literal, $ticks_per_bit:literal, $ptt_inverted:ident, $rx_inverted:literal ) => {
+        $crate::critical_section::with(|cs| {
+            ASK_DRIVER
+                .borrow(cs)
+                .replace(Some($crate::driver::AskDriver::new(
+                    $tx,
+                    $rx,
+                    $ptt,
+                    $ticks_per_bit,
                     $ptt_inverted,
                     $rx_inverted,
                 )));

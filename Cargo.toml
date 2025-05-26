@@ -6,6 +6,7 @@ authors = ["Annie Ehler <annie.ehler.4@gmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/annie444/ask433"
+description = "A no_std, embedded-hal ASK/OOK modem driver for 433 MHz RF modules (e.g., FS1000A). Supports RX/TX, 4b6b encoding, and software PLL demodulation."
 
 [features]
 std = []

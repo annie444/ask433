@@ -1,18 +1,23 @@
 [package]
 name = "ask433"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["Annie Ehler <annie.ehler.4@gmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/annie444/ask433"
 description = "A no_std, embedded-hal ASK/OOK modem driver for 433 MHz RF modules (e.g., FS1000A). Supports RX/TX, 4b6b encoding, and software PLL demodulation."
+categories = ["embedded", "hardware-support", "no-std"]
+documentation = "https://docs.rs/ask433"
+rust-version = "1.86"
+keywords = ["hal", "IO"]
+
 
 [features]
 std = []
 delayus-loop = []
 timer-isr = ["dep:critical-section"]
-defmt = [
+defmt-0-3 = [
   "dep:defmt",
   "embedded-hal/defmt-03",
   "heapless/defmt-03",
@@ -25,7 +30,7 @@ default = ["timer-isr", "dep:heapless"]
 embedded-hal = "1.0.0"
 
 # defmt feature
-defmt = { version = "1.0.1", optional = true }
+defmt = { version = "0.3", optional = true }
 # log feature
 log = { version = "0.4.27", optional = true, default-features = false }
 # timer-isr feature
@@ -34,7 +39,6 @@ critical-section = { version = "1.2.0", optional = true }
 heapless = { version = "0.8.0", optional = true }
 libm = "0.2.15"
 nb = "1.1.0"
-lazy_static = "1.5.0"
 
 [dev-dependencies]
 embedded-hal-mock = "0.11.1"

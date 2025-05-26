@@ -19,6 +19,11 @@ macro_rules! init_ask_driver {
             core::cell::RefCell<Option<$crate::driver::AskDriver<$tx, $rx, $ptt>>>,
         > = critical_section::Mutex::new(core::cell::RefCell::new(None));
     };
+    ( $tx:path, $rx:path, $ptt:path ) => {
+        pub static ASK_DRIVER: critical_section::Mutex<
+            core::cell::RefCell<Option<$crate::driver::AskDriver<$tx, $rx, $ptt>>>,
+        > = critical_section::Mutex::new(core::cell::RefCell::new(None));
+    };
 }
 
 /// Initializes the global `ASK_DRIVER` singleton with a new driver instance.

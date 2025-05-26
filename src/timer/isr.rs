@@ -1,7 +1,11 @@
+#[cfg(not(feature = "std"))]
+use crate::consts::ASK_MAX_MESSAGE_LEN_USIZE;
 use crate::driver::AskDriver;
 use core::cell::RefCell;
 use critical_section::Mutex;
 use embedded_hal::digital::{InputPin, OutputPin};
+#[cfg(not(feature = "std"))]
+use heapless::Vec;
 
 /// Used to initialize the global static `AskDriver` for use with
 /// `critical_section`.
@@ -84,4 +88,204 @@ pub fn global_ask_timer_tick<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
             driver.tick();
         }
     });
+}
+
+/// Attempts to receive a message from a global `AskDriver` instance wrapped in a `Mutex`.
+///
+/// This function checks whether a valid and complete message is available using the
+/// driver's `availabile()` method. If a message is present, it returns a heapless `Vec`
+/// containing the decoded payload. If the buffer is invalid or incomplete, `None` is returned.
+///
+/// # Type Parameters
+/// - `TX`: Type of the TX pin (must implement `OutputPin`)
+/// - `RX`: Type of the RX pin (must implement `InputPin`)
+/// - `PTT`: Type of the Push-To-Talk (PTT) control pin (must implement `OutputPin`)
+///
+/// # Arguments
+/// - `global_driver`: A reference to a global `Mutex<RefCell<Option<AskDriver>>>`
+///   that wraps the ASK driver state, typically created using `critical_section`.
+///
+/// # Returns
+/// - `Some(Vec<u8>)`: A heapless vector containing the decoded message payload
+/// - `None`: If no valid message is currently available
+///
+/// # Safety
+/// - This function must be called from a context where `critical_section` access is safe,
+///   such as inside `main()` or an interrupt-free routine.
+///
+/// # Example
+/// ```rust
+/// if let Some(msg) = receive_from_global_ask(&ASK_DRIVER) {
+///     // Use the received message
+/// }
+/// ```
+///
+/// # See also
+/// - [`AskDriver::availabile()`]
+/// - [`AskDriver::receive()`]
+#[cfg(not(feature = "std"))]
+pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
+    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+) -> Option<Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>> {
+    critical_section::with(|cs| {
+        let mut guard = global_driver.borrow(cs).borrow_mut();
+        let driver = guard.as_mut()?;
+        if driver.availabile() {
+            driver.receive()
+        } else {
+            None
+        }
+    })
+}
+
+/// Attempts to receive a message from a global `AskDriver` instance wrapped in a `Mutex`.
+///
+/// This function checks whether a valid and complete message is available using the
+/// driver's `availabile()` method. If a message is present, it returns a heapless `Vec`
+/// containing the decoded payload. If the buffer is invalid or incomplete, `None` is returned.
+///
+/// # Type Parameters
+/// - `TX`: Type of the TX pin (must implement `OutputPin`)
+/// - `RX`: Type of the RX pin (must implement `InputPin`)
+/// - `PTT`: Type of the Push-To-Talk (PTT) control pin (must implement `OutputPin`)
+///
+/// # Arguments
+/// - `global_driver`: A reference to a global `Mutex<RefCell<Option<AskDriver>>>`
+///   that wraps the ASK driver state, typically created using `critical_section`.
+///
+/// # Returns
+/// - `Some(Vec<u8>)`: A vector containing the decoded message payload
+/// - `None`: If no valid message is currently available
+///
+/// # Safety
+/// - This function must be called from a context where `critical_section` access is safe,
+///   such as inside `main()` or an interrupt-free routine.
+///
+/// # Example
+/// ```rust
+/// if let Some(msg) = receive_from_global_ask(&ASK_DRIVER) {
+///     // Use the received message
+/// }
+/// ```
+///
+/// # See also
+/// - [`AskDriver::availabile()`]
+/// - [`AskDriver::receive()`]
+#[cfg(feature = "std")]
+pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
+    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+) -> Option<Vec<u8>> {
+    critical_section::with(|cs| {
+        let mut guard = global_driver.borrow(cs).borrow_mut();
+        let driver = guard.as_mut()?;
+        if driver.availabile() {
+            driver.receive()
+        } else {
+            None
+        }
+    })
+}
+
+/// Sends a message using a global `AskDriver` instance wrapped in a `Mutex`.
+///
+/// This function attempts to send the provided message buffer using the global
+/// ASK driver. If the driver is currently idle and the message length is valid,
+/// it transitions to transmit mode and begins sending the encoded message
+/// (including headers, preamble, and CRC).
+///
+/// # Type Parameters
+/// - `TX`: The TX pin type (must implement `OutputPin`)
+/// - `RX`: The RX pin type (must implement `InputPin`)
+/// - `PTT`: The Push-To-Talk (PTT) control pin type (must implement `OutputPin`)
+///
+/// # Arguments
+/// - `global_driver`: A reference to a global `Mutex<RefCell<Option<AskDriver>>>`,
+///   typically declared using [`init_global_ask_driver!`] and initialized via [`setup_global_ask_driver!`].
+/// - `vec`: A `heapless::Vec<u8>` containing the payload to send. Must not exceed [`ASK_MAX_MESSAGE_LEN`].
+///
+/// # Returns
+/// - `true` if the message was successfully queued for transmission
+/// - `false` if the driver was uninitialized or busy
+///
+/// # Example
+/// ```rust
+/// let mut vec: Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE> = Vec::new();
+/// vec.extend_from_slice(b"Hello").unwrap();
+/// let sent = send_from_global_ask(&ASK_DRIVER, vec);
+/// if sent {
+///     // Message is being transmitted
+/// }
+/// ```
+///
+/// # Notes
+/// - This function does not block. Transmission occurs incrementally via repeated `tick()` calls.
+/// - Returns `false` if the driver is uninitialized or already transmitting a message.
+/// - The PTT pin is asserted automatically during transmission.
+///
+/// # See also
+/// - [`AskDriver::send()`]
+#[cfg(not(feature = "std"))]
+pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
+    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    vec: Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>,
+) -> bool {
+    critical_section::with(|cs| {
+        if let Some(driver) = global_driver.borrow(cs).borrow_mut().as_mut() {
+            driver.send(vec)
+        } else {
+            false
+        }
+    })
+}
+
+/// Sends a message using a global `AskDriver` instance wrapped in a `Mutex`.
+///
+/// This function attempts to send the provided message buffer using the global
+/// ASK driver. If the driver is currently idle and the message length is valid,
+/// it transitions to transmit mode and begins sending the encoded message
+/// (including headers, preamble, and CRC).
+///
+/// # Type Parameters
+/// - `TX`: The TX pin type (must implement `OutputPin`)
+/// - `RX`: The RX pin type (must implement `InputPin`)
+/// - `PTT`: The Push-To-Talk (PTT) control pin type (must implement `OutputPin`)
+///
+/// # Arguments
+/// - `global_driver`: A reference to a global `Mutex<RefCell<Option<AskDriver>>>`,
+///   typically declared using [`init_global_ask_driver!`] and initialized via [`setup_global_ask_driver!`].
+/// - `vec`: A `Vec<u8>` containing the payload to send.
+///
+/// # Returns
+/// - `true` if the message was successfully queued for transmission
+/// - `false` if the driver was uninitialized or busy
+///
+/// # Example
+/// ```rust
+/// let mut vec: Vec<u8> = Vec::new();
+/// vec.extend(b"Hello");
+/// let sent = send_from_global_ask(&ASK_DRIVER, vec);
+/// if sent {
+///     // Message is being transmitted
+/// }
+/// ```
+///
+/// # Notes
+/// - This function does not block. Transmission occurs incrementally via repeated `tick()` calls.
+/// - Returns `false` if the driver is uninitialized or already transmitting a message.
+/// - The PTT pin is asserted automatically during transmission.
+///
+/// # See also
+/// - [`AskDriver::send()`]
+#[cfg(feature = "std")]
+pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
+    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    vec: Vec<u8>,
+) -> bool {
+    critical_section::with(|cs| {
+        if let Some(driver) = global_driver.borrow(cs).borrow_mut().as_mut() {
+            driver.send(vec)
+        } else {
+            false
+        }
+    })
 }

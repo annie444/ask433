@@ -289,3 +289,156 @@ macro_rules! tick_ask_timer {
         });
     };
 }
+
+/// Attempts to receive a completed message from the global ASK driver instance.
+///
+/// This macro checks whether a valid and complete message is available using
+/// `driver.availabile()`, and if so, returns a reference to the decoded message
+/// payload slice. If no message is available, or the driver is currently transmitting,
+/// it returns `None`.
+///
+/// # Requirements
+/// - The global `ASK_DRIVER` instance must have been initialized using
+///   [`init_global_ask_driver!`] and [`setup_global_ask_driver!`].
+/// - Must be called in a context where `critical_section` is available and safe to use.
+///
+/// # Returns
+/// - `Some(&[u8])`: A reference to the message payload if available
+/// - `None`: If no message is currently available
+///
+/// # Example
+/// ```rust
+/// if let Some(msg) = receive_from_ask!() {
+///     // Process message payload
+/// }
+/// ```
+#[macro_export]
+macro_rules! receive_from_ask {
+    () => {
+        $crate::critical_section::with(|cs| {
+            if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                if driver.availabile() {
+                    driver.receive()
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+    };
+}
+
+/// Sends a message from the global ASK driver using a heapless `Vec<u8>`.
+///
+/// This macro supports two usage patterns:
+/// 1. Repeating a single element: `send_from_ask!(0xAA; 10)`
+/// 2. Sending an explicit sequence of bytes: `send_from_ask!(0x01, 0x02, 0x03)`
+///
+/// The message is internally collected into a `heapless::Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>`
+/// and passed to the `send()` method on the global driver.
+///
+/// # Requirements
+/// - The driver must be initialized via `init_global_ask_driver!` and `setup_global_ask_driver!`.
+///
+/// # Panics
+/// - Will panic at runtime if the message exceeds `ASK_MAX_MESSAGE_LEN`
+///
+/// # Example
+/// ```rust
+/// send_from_ask!(0xAB; 4);         // send [0xAB, 0xAB, 0xAB, 0xAB]
+/// send_from_ask!(1, 2, 3, 4, 5);   // send [1, 2, 3, 4, 5]
+/// send_from_ask!("Hello, World!")  // send [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21]
+/// ```
+#[cfg(not(feature = "std"))]
+#[macro_export]
+macro_rules! send_from_ask {
+    ($elem:expr) => {
+        $crate::critical_section::with(|cs| {
+            if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                let message: $crate::heapless::Vec<u8, $crate::consts::ASK_MAX_MESSAGE_LEN_USIZE> = $crate::heapless::Vec::from_slice($elem.as_bytes()).unwrap();
+                driver.send(vec)
+            } else {
+                false
+            }
+        })
+    };
+    ($elem:expr; $n:expr) => {
+        $crate::critical_section::with(|cs| {
+            if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                let mut vec = $crate::heapless::Vec::new();
+                vec.extend([$elem; $n]);
+                driver.send(vec)
+            } else {
+                false
+            }
+        })
+    };
+    ($($x:expr),+ $(,)?) => {
+        $crate::critical_section::with(|cs| {
+            if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                let mut vec: $crate::heapless::Vec<u8, $crate::consts::ASK_MAX_MESSAGE_LEN_USIZE> = $crate::heapless::Vec::new();
+                for item in [$($x),+] {
+                    let _ = vec.push(item);
+                }
+                driver.send(vec)
+            } else {
+                false
+            }
+        })
+    };
+}
+
+/// Sends a message from the global ASK driver using a heapless `Vec<u8>`.
+///
+/// This macro supports two usage patterns:
+/// 1. Repeating a single element: `send_from_ask!(0xAA; 10)`
+/// 2. Sending an explicit sequence of bytes: `send_from_ask!(0x01, 0x02, 0x03)`
+///
+/// The message is internally collected into a `heapless::Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>`
+/// and passed to the `send()` method on the global driver.
+///
+/// # Requirements
+/// - The driver must be initialized via `init_global_ask_driver!` and `setup_global_ask_driver!`.
+///
+/// # Panics
+/// - Will panic at runtime if the message exceeds `ASK_MAX_MESSAGE_LEN`
+///
+/// # Example
+/// ```rust
+/// send_from_ask!(0xAB; 4);         // send [0xAB, 0xAB, 0xAB, 0xAB]
+/// send_from_ask!(1, 2, 3, 4, 5);   // send [1, 2, 3, 4, 5]
+/// send_from_ask!("Hello, World!")  // send [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21]
+/// ```
+#[cfg(feature = "std")]
+#[macro_export]
+macro_rules! send_from_ask {
+    ($elem:expr) => {
+        $crate::critical_section::with(|cs| {
+            let mut guard = ASK_DRIVER.borrow(cs).borrow_mut();
+            let driver = guard.as_mut()?;
+            let message: Vec<u8> = Vec::from($elem.as_bytes());
+            driver.send(vec)
+        })
+    };
+    ($elem:expr; $n:expr) => {
+        $crate::critical_section::with(|cs| {
+            let mut guard = ASK_DRIVER.borrow(cs).borrow_mut();
+            let driver = guard.as_mut()?;
+            let mut vec = Vec::new();
+            vec.extend([$elem; $n]);
+            driver.send(vec)
+        })
+    };
+    ($($x:expr),+ $(,)?) => {
+        $crate::critical_section::with(|cs| {
+            let mut guard = ASK_DRIVER.borrow(cs).borrow_mut();
+            let driver = guard.as_mut()?;
+            let mut vec: Vec<u8> = Vec::new();
+            for item in [$($x),+] {
+                vec.push(item);
+            }
+            driver.send(vec)
+        })
+    };
+}

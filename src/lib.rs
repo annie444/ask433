@@ -87,6 +87,9 @@
 
 pub use critical_section;
 
+#[cfg(not(feature = "std"))]
+pub use heapless;
+
 pub mod consts;
 pub(crate) mod crc;
 pub mod driver;

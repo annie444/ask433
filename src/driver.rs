@@ -414,7 +414,7 @@ where
     /// and CRC trailer.
     ///
     /// # Returns
-    /// - `Some(&[u8])`: A reference to the message payload slice
+    /// - `Some(Vec<u8>)`: The message payload
     /// - `None`: If no valid message has been received or the buffer is incomplete
     ///
     /// # Message Layout
@@ -434,14 +434,59 @@ where
     /// # Panics
     /// May panic if `buf_len` is smaller than `ASK_HEADER_LEN + 1`, but this should never
     /// happen in a valid message.
-    pub fn receive(&mut self) -> Option<&[u8]> {
+    #[cfg(not(feature = "std"))]
+    pub fn receive(&mut self) -> Option<Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>> {
         if !self.availabile() {
             return None;
         }
 
         let message_len: u8 = self.pll.buf_len - ASK_HEADER_LEN - 3;
         self.rx_buf_valid = false;
-        Some(&self.pll.buf[((ASK_HEADER_LEN + 1) as usize)..(message_len as usize)])
+        let message =
+            Vec::from_slice(&self.pll.buf[((ASK_HEADER_LEN + 1) as usize)..(message_len as usize)])
+                .unwrap();
+        Some(message)
+    }
+
+    /// Returns a slice of the received message payload, if a valid message is available.
+    ///
+    /// This method checks whether a complete and validated message is available
+    /// in the internal receive buffer (via [`AskDriver::availabile()`]), and if so,
+    /// returns a slice containing just the message payload, excluding the protocol headers
+    /// and CRC trailer.
+    ///
+    /// # Returns
+    /// - `Some(Vec<u8>)`: The message payload slice
+    /// - `None`: If no valid message has been received or the buffer is incomplete
+    ///
+    /// # Message Layout
+    /// The internal buffer (`self.pll.buf`) is assumed to follow the structure:
+    /// `[len, to, from, id, flags, ...payload..., crc_hi, crc_lo]`
+    ///
+    /// This function:
+    /// - Reads the total message length from `self.pll.buf_len`
+    /// - Calculates the offset of the payload by skipping the 4-byte header and 2-byte CRC
+    /// - Returns a slice over just the user data portion of the message
+    ///
+    /// # Notes
+    /// - This does **not** clear the receive buffer; call `self.set_mode_idle()` or
+    ///   a specific buffer-reset method after processing.
+    /// - The returned slice is valid until the next driver state change that modifies the RX buffer.
+    ///
+    /// # Panics
+    /// May panic if `buf_len` is smaller than `ASK_HEADER_LEN + 1`, but this should never
+    /// happen in a valid message.
+    #[cfg(feature = "std")]
+    pub fn receive(&mut self) -> Option<Vec<u8>> {
+        if !self.availabile() {
+            return None;
+        }
+
+        let message_len: u8 = self.pll.buf_len - ASK_HEADER_LEN - 3;
+        self.rx_buf_valid = false;
+        let message =
+            Vec::from(&self.pll.buf[((ASK_HEADER_LEN + 1) as usize)..(message_len as usize)]);
+        Some(message)
     }
 
     /// Advances the internal transmit/receive state machine by one timing tick.

@@ -12,7 +12,6 @@ documentation = "https://docs.rs/ask433"
 rust-version = "1.86"
 keywords = ["hal", "IO"]
 
-
 [features]
 std = []
 delayus-loop = []

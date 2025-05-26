@@ -15,14 +15,9 @@
 #[macro_export]
 macro_rules! init_ask_driver {
     ( $tx:ty, $rx:ty, $ptt:ty ) => {
-        pub static ASK_DRIVER: critical_section::Mutex<
+        pub static ASK_DRIVER: $crate::critical_section::Mutex<
             core::cell::RefCell<Option<$crate::driver::AskDriver<$tx, $rx, $ptt>>>,
-        > = critical_section::Mutex::new(core::cell::RefCell::new(None));
-    };
-    ( $tx:path, $rx:path, $ptt:path ) => {
-        pub static ASK_DRIVER: critical_section::Mutex<
-            core::cell::RefCell<Option<$crate::driver::AskDriver<$tx, $rx, $ptt>>>,
-        > = critical_section::Mutex::new(core::cell::RefCell::new(None));
+        > = $crate::critical_section::Mutex::new(core::cell::RefCell::new(None));
     };
 }
 
@@ -54,7 +49,7 @@ macro_rules! init_ask_driver {
 #[macro_export]
 macro_rules! setup_ask_driver {
     ( $tx:ident, $rx:ident, $ptt:ident, $tpb:ident, $ptt_inverted:ident, $rx_inverted:ident ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -68,7 +63,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:literal, $tpb:ident, $ptt_inverted:ident, $rx_inverted:ident ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -82,7 +77,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:literal, $tpb:literal, $ptt_inverted:ident, $rx_inverted:ident ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -96,7 +91,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:literal, $tpb:literal, $ptt_inverted:literal, $rx_inverted:ident ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -110,7 +105,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:literal, $tpb:literal, $ptt_inverted:literal, $rx_inverted:literal ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -124,7 +119,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:ident, $tpb:ident, $ptt_inverted:ident, $rx_inverted:literal ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -138,7 +133,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:ident, $tpb:ident, $ptt_inverted:literal, $rx_inverted:literal ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -152,7 +147,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:ident, $tpb:literal, $ptt_inverted:literal, $rx_inverted:literal ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -166,7 +161,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:ident, $tpb:literal, $ptt_inverted:ident, $rx_inverted:literal ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -180,7 +175,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:literal, $tpb:ident, $ptt_inverted:literal, $rx_inverted:ident ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -194,7 +189,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:literal, $tpb:ident, $ptt_inverted:ident, $rx_inverted:literal ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -208,7 +203,7 @@ macro_rules! setup_ask_driver {
         });
     };
     ( $tx:ident, $rx:ident, $ptt:ident, $tpb:literal, $ptt_inverted:literal, $rx_inverted:ident ) => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             ASK_DRIVER
                 .borrow(cs)
                 .replace(Some($crate::driver::AskDriver::new(
@@ -243,7 +238,7 @@ macro_rules! setup_ask_driver {
 #[macro_export]
 macro_rules! tick_ask_timer {
     () => {
-        critical_section::with(|cs| {
+        $crate::critical_section::with(|cs| {
             if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
                 driver.tick();
             }

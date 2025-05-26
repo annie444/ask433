@@ -85,6 +85,8 @@
 )]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub use critical_section;
+
 pub mod consts;
 pub(crate) mod crc;
 pub mod driver;

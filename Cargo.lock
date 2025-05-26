@@ -4,10 +4,10 @@ version = 4
 
 [[package]]
 name = "ask433"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "critical-section",
- "defmt 1.0.1",
+ "defmt 0.3.100",
  "embedded-hal 1.0.0",
  "embedded-hal-mock",
  "heapless",

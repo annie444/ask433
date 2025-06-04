@@ -35,7 +35,7 @@ jobs:
           components: clippy
       - uses: actions-rs/clippy-check@v1
         with:
-          args: "--features ${{ matrix.features }} --all-targets"
+          args: "--no-default-features --features ${{ matrix.features }} --all-targets"
           name: "clippy-check-${{ matrix.toolchain }}-${{ matrix.features }}"
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -54,7 +54,7 @@ jobs:
         with:
           toolchain: "${{ matrix.toolchain }}"
           components: clippy
-      - run: cargo test --all-targets --features delay-loop,timer-isr -vv
+      - run: cargo test --all-targets --no-default-features --features std,delay-loop,timer-isr -vv
 
   build:
     name: Build features
@@ -75,7 +75,7 @@ jobs:
           toolchain: "${{ matrix.toolchain }}"
           components: clippy
       - name: Build features
-        run: cargo build --features "${{ matrix.features }}" -vv
+        run: cargo build --no-default-features --features "${{ matrix.features }}" -vv
 
   doc:
     name: Build Documentation

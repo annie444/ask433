@@ -42,6 +42,11 @@ jobs:
   tests:
     name: Run Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features:
+          - "delay-loop,timer-isr"
+          - "std,delay-loop,timer-isr"
     steps:
       - uses: actions/checkout@v4
       - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
@@ -49,7 +54,7 @@ jobs:
         with:
           toolchain: nightly
           components: clippy
-      - run: cargo test --all-targets --no-default-features --features std,delay-loop,timer-isr -vv
+      - run: "cargo test --all-targets --no-default-features --features ${{ matrix.features }} -vv"
 
   build:
     name: Build features

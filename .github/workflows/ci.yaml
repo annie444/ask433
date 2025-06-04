@@ -54,7 +54,7 @@ jobs:
         with:
           toolchain: "${{ matrix.toolchain }}"
           components: clippy
-      - run: cargo test --all-targets --features std,delay-loop,timer-isr -vv
+      - run: cargo test --all-targets --features delay-loop,timer-isr -vv
 
   build:
     name: Build features

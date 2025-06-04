@@ -15,32 +15,20 @@ keywords = ["hal", "IO"]
 rustc-args = ["--features", "delay-loop,timer-isr"]
 
 [features]
-std = ["thiserror/std", "critical-section/std", "log/std"]
+std = ["critical-section/std"]
 delay-loop = []
 timer-isr = ["dep:critical-section"]
-defmt-0-3 = [
-  "dep:defmt",
-  "embedded-hal/defmt-03",
-  "heapless/defmt-03",
-  "nb/defmt-0-3",
-]
-log = ["dep:log"]
+defmt-0-3 = ["embedded-hal/defmt-03", "heapless/defmt-03", "nb/defmt-0-3"]
 default = ["timer-isr"]
 
 [dependencies]
 embedded-hal = "1.0.0"
-
-# defmt feature
-defmt = { version = "0.3", optional = true }
-# log feature
-log = { version = "0.4.27", optional = true }
 # timer-isr feature
 critical-section = { version = "1.2.0", optional = true }
 # no-std feature
 heapless = { version = "0.8.0" }
 libm = "0.2.15"
 nb = "1.1.0"
-thiserror = { version = "2.0.12", default-features = false }
 
 [dev-dependencies]
 embedded-hal-mock = { version = "0.11.1", features = ["eh1"] }

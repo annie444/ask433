@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "ask433"
-version = "0.1.5"
+version = "0.2.0"
 dependencies = [
  "critical-section",
  "embedded-hal 1.0.0",

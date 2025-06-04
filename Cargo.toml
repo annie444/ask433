@@ -1,6 +1,6 @@
 [package]
 name = "ask433"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 authors = ["Annie Ehler <annie.ehler.4@gmail.com>"]
 license = "MIT OR Apache-2.0"
@@ -12,7 +12,7 @@ documentation = "https://docs.rs/ask433"
 keywords = ["hal", "IO"]
 
 [package.metadata.docs.rs]
-rustc-args = ["--features", "delay-loop,timer-isr"]
+features = ["timer-isr", "delay-loop"]
 
 [features]
 std = ["critical-section/std"]

@@ -1,7 +1,6 @@
 # ask433
 
-[![Crates.io](https://img.shields.io/crates/v/ask433.svg)](https://crates.io/crates/ask433)
-[![Docs.rs](https://img.shields.io/docsrs/ask433)](https://docs.rs/ask433)
+[![Crates.io](https://img.shields.io/crates/v/ask433.svg)](https://crates.io/crates/ask433) [![Docs.rs](https://img.shields.io/docsrs/ask433)](https://docs.rs/ask433) [![CI](https://github.com/annie444/ask433/actions/workflows/ci.yaml/badge.svg)](https://github.com/annie444/ask433/actions/workflows/ci.yaml)
 
 **A portable, no_std Amplitude Shift Keying (ASK/OOK) modem driver for 433 MHz RF transceivers.**
 

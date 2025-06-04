@@ -24,8 +24,8 @@ jobs:
           - stable
           - nightly
         features:
-          - "delayus-loop,timer-isr"
-          - "std,delayus-loop,timer-isr"
+          - "delay-loop,timer-isr"
+          - "std,delay-loop,timer-isr"
     steps:
       - uses: actions/checkout@v4
       - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
@@ -53,7 +53,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "${{ matrix.toolchain }}"
-      - run: cargo test --all-targets --features std,delayus-loop,timer-isr --verbose
+      - run: cargo test --all-targets --features std,delay-loop,timer-isr --verbose
 
   build:
     name: Build features
@@ -64,8 +64,8 @@ jobs:
           - stable
           - nightly
         features:
-          - "delayus-loop,timer-isr"
-          - "std,delayus-loop,timer-isr"
+          - "delay-loop,timer-isr"
+          - "std,delay-loop,timer-isr"
     steps:
       - uses: actions/checkout@v4
       - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
@@ -82,4 +82,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Build docs with all features
-        run: cargo doc --features timer-isr,delayus-loop
+        run: cargo doc --features timer-isr,delay-loop

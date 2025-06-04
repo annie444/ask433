@@ -35,7 +35,7 @@ jobs:
           components: "clippy, rustfmt"
       - uses: actions-rs/clippy-check@v1
         with:
-          args: "--verbose --features ${{ matrix.features }} --all-targets"
+          args: "--features ${{ matrix.features }} --all-targets"
           name: "clippy-check-${{ matrix.toolchain }}-${{ matrix.features }}"
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,7 +53,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "${{ matrix.toolchain }}"
-      - run: cargo test --all-targets --features std,delay-loop,timer-isr --verbose
+      - run: cargo test --all-targets --features std,delay-loop,timer-isr -vv
 
   build:
     name: Build features
@@ -73,7 +73,7 @@ jobs:
         with:
           toolchain: "${{ matrix.toolchain }}"
       - name: Build features
-        run: cargo build --features "${{ matrix.features }}" --verbose
+        run: cargo build --features "${{ matrix.features }}" -vv
 
   doc:
     name: Build Documentation
@@ -82,4 +82,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Build docs with all features
-        run: cargo doc --features timer-isr,delay-loop --verbose
+        run: cargo doc --features timer-isr,delay-loop -vv

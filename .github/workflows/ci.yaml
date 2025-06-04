@@ -10,6 +10,14 @@ jobs:
   check:
     name: Lint and Format
     runs-on: ubuntu-latest
+    permissions:
+      attestations: write
+      checks: write
+      contents: read
+      issues: write
+      pull-requests: write
+      security-events: write
+      statuses: write
     strategy:
       matrix:
         toolchain:
@@ -29,6 +37,7 @@ jobs:
         with:
           args: "--verbose --features ${{ matrix.features }} --all-targets"
           name: "clippy-check-${{ matrix.toolchain }}-${{ matrix.features }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   tests:
     name: Run Tests
@@ -44,7 +53,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "${{ matrix.toolchain }}"
-          components: "clippy, rustfmt"
       - run: cargo test --all-targets --features std,delayus-loop,timer-isr --verbose
 
   build:
@@ -64,9 +72,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: "${{ matrix.toolchain }}"
-          components: "clippy, rustfmt"
       - name: Build features
         run: cargo build --features "${{ matrix.features }}"
+
   doc:
     name: Build Documentation
     runs-on: ubuntu-latest

@@ -196,19 +196,6 @@ impl SoftwarePLL {
                     // The 6 lsbits are the high nybble
                     let this_byte =
                         decode_6b4b(&((self.bits & 0x3f) as u8), &((self.bits >> 6) as u8));
-                    use std::io::Write;
-                    std::fs::File::options()
-                        .write(true)
-                        .append(true)
-                        .create(true)
-                        .open("ask433.log")
-                        .expect("Failed to create log file")
-                        .write_all(
-                            format!("this_byte: {}, buf_len {}\n", this_byte, self.buf_len)
-                                .as_bytes(),
-                        )
-                        .expect("Failed to write to log file");
-
                     // The first decoded byte is the byte count of the following message
                     // the count includes the byte count and the 2 trailing FCS bytes
                     // REVISIT: may also include the ACK flag at 0x40

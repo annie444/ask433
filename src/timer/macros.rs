@@ -199,7 +199,7 @@ macro_rules! send_from_ask {
             } else {
                 false
             }
-        });
+        })
     };
     ($elem:expr; $n:expr) => {
         $crate::critical_section::with(|cs| {
@@ -210,7 +210,7 @@ macro_rules! send_from_ask {
             } else {
                 false
             }
-        });
+        })
     };
     ($($x:expr),+ $(,)?) => {
         $crate::critical_section::with(|cs| {
@@ -223,7 +223,7 @@ macro_rules! send_from_ask {
             } else {
                 false
             }
-        });
+        })
     };
 }
 
@@ -270,7 +270,7 @@ macro_rules! send_from_ask {
             } else {
                 false
             }
-        });
+        })
     };
     ($elem:expr; $n:expr) => {
         $crate::critical_section::with(|cs| {
@@ -281,7 +281,7 @@ macro_rules! send_from_ask {
             } else {
                 false
             }
-        });
+        })
     };
     ($($x:expr),+ $(,)?) => {
         $crate::critical_section::with(|cs| {
@@ -294,7 +294,7 @@ macro_rules! send_from_ask {
             } else {
                 false
             }
-        });
+        })
     };
 }
 

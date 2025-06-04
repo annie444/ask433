@@ -1,3 +1,0 @@
-[target.'cfg(test = true)']
-rustflags = ["-Zmacro-backtrace"]
-rustdocflags = ["-Zmacro-backtrace"]

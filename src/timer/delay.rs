@@ -15,9 +15,19 @@ use embedded_hal::digital::{InputPin, OutputPin};
 ///
 /// # Example
 /// ```rust
-/// use ask433::run_ask_tick_loop;
-/// let mut driver = AskDriver::new(tx, rx, 8);
+/// # use embedded_hal_mock::eh1::delay::NoopDelay as Delay;
+/// # use embedded_hal_mock::eh1::digital::{
+/// #     Mock as Pin, State as PinState, Transaction as PinTransaction,
+/// # };
+/// use ask433::driver::AskDriver;
+/// use ask433::timer::run_ask_tick_loop;
+/// # let tx = Pin::new(&[PinTransaction::set(PinState::Low)]);
+/// # let rx = Pin::new(&[]);
+/// let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx, rx, None, 8, None, None);
+/// let mut delay = Delay::new();
 /// run_ask_tick_loop(&mut driver, &mut delay, 63);
+/// # driver.tx.done();
+/// # driver.rx.done();
 /// ```
 ///
 /// # Notes

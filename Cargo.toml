@@ -44,5 +44,7 @@ thiserror = { version = "2.0.12", default-features = false }
 
 [dev-dependencies]
 embedded-hal-mock = { version = "0.11.1", features = ["eh1"] }
-ask433 = { path = ".", features = ["std", "timer-isr", "delay-loop"] }
-critical-section = { version = "1.2.0", features = ["restore-state-bool"] }
+critical-section = { version = "1.2.0", features = [
+  "std",
+  "restore-state-bool",
+] }

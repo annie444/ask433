@@ -775,13 +775,21 @@ mod tests {
 
     #[test]
     fn test_send_message_starts_transmission() {
+        #[cfg(not(feature = "std"))]
+        use heapless::Vec;
+        #[cfg(feature = "std")]
+        use std::vec::Vec;
+
         let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
         let rx = PinMock::new(&[]);
         let ptt = PinMock::new(&[PinTransaction::set(PinState::High)]);
 
         let mut driver = AskDriver::new(tx, rx, Some(ptt), 8, Some(false), Some(false));
-        let mut message: Vec<u8> = Vec::new();
+        let mut message = Vec::new();
+        #[cfg(feature = "std")]
         message.extend_from_slice(b"Hi");
+        #[cfg(not(feature = "std"))]
+        let _ = message.extend_from_slice(b"Hi");
 
         assert!(driver.send(message));
         assert_eq!(driver.mode, AskMode::Tx);
@@ -791,6 +799,7 @@ mod tests {
         let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn test_tick_transmit_advances_tx_state() {
         let tx_states = vec![

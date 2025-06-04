@@ -183,8 +183,19 @@ mod tests {
 
     #[test]
     fn test_decode_buffer_odd_length_fails() {
+        #[cfg(not(feature = "std"))]
+        use heapless::Vec;
+        #[cfg(feature = "std")]
+        use std::vec::Vec;
+
         let input = [0x2a];
         let result = decode_buffer(&input);
-        assert_eq!(result, vec![]);
+
+        #[cfg(feature = "std")]
+        let expected: Vec<u8> = Vec::new();
+        #[cfg(not(feature = "std"))]
+        let expected: Vec<u8, ASK_MAX_PAYLOAD_LEN_USIZE> = Vec::new();
+
+        assert_eq!(result, expected);
     }
 }

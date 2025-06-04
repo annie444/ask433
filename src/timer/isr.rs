@@ -140,6 +140,15 @@ pub fn global_ask_timer_tick<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 ///
 /// # Example
 /// ```rust
+/// # use embedded_hal_mock::eh1::digital::Mock as Pin;
+/// use critical_section::Mutex;
+/// use core::cell::RefCell;
+/// use ask433::driver::AskDriver;
+/// use ask433::timer::{global_ask_driver_init, receive_from_global_ask};
+///
+/// static ASK_DRIVER: Mutex<RefCell<Option<AskDriver<Pin, Pin, Pin>>>> =
+///     global_ask_driver_init::<Pin, Pin, Pin>();
+/// // ...
 /// if let Some(msg) = receive_from_global_ask(&ASK_DRIVER) {
 ///     // Use the received message
 /// }
@@ -249,7 +258,8 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// use heapless::Vec;
 /// use core::cell::RefCell;
 /// use ask433::driver::AskDriver;
-/// use ask433::timer::isr::{global_ask_driver_init, receive_from_global_ask};
+/// use ask433::timer::{global_ask_driver_init, send_from_global_ask};
+/// use ask433::consts::ASK_MAX_MESSAGE_LEN_USIZE;
 ///
 /// static ASK_DRIVER: Mutex<RefCell<Option<AskDriver<Pin, Pin, Pin>>>> =
 ///     global_ask_driver_init::<Pin, Pin, Pin>();
@@ -272,11 +282,11 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 #[cfg(not(feature = "std"))]
 pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
     global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
-    vec: Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>,
+    msg: Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>,
 ) -> bool {
     critical_section::with(|cs| {
         if let Some(driver) = global_driver.borrow(cs).borrow_mut().as_mut() {
-            driver.send(vec)
+            driver.send(msg)
         } else {
             false
         }
@@ -332,11 +342,11 @@ pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 #[cfg(feature = "std")]
 pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
     global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
-    vec: Vec<u8>,
+    msg: Vec<u8>,
 ) -> bool {
     critical_section::with(|cs| {
         if let Some(driver) = global_driver.borrow(cs).borrow_mut().as_mut() {
-            driver.send(vec)
+            driver.send(msg)
         } else {
             false
         }
@@ -359,12 +369,20 @@ mod tests {
 
         let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
         let rx = PinMock::new(&[]);
-        let ptt = Some(PinMock::new(&[PinTransaction::set(PinState::Low)]));
+        let ptt = Some(PinMock::new(&[]));
 
         global_ask_driver_setup(&GLOBAL_DRIVER, tx, rx, ptt, TICKS, Some(false), Some(false));
 
         critical_section::with(|cs| {
             assert!(GLOBAL_DRIVER.borrow(cs).borrow().is_some());
+        });
+
+        critical_section::with(|cs| {
+            if let Some(driver) = GLOBAL_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                driver.tx.done();
+                driver.rx.done();
+                let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+            }
         });
     }
 
@@ -376,11 +394,19 @@ mod tests {
 
         let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
         let rx = PinMock::new(&[]);
-        let ptt = Some(PinMock::new(&[PinTransaction::set(PinState::Low)]));
+        let ptt = Some(PinMock::new(&[]));
 
         global_ask_driver_setup(&GLOBAL_DRIVER, tx, rx, ptt, TICKS, Some(false), Some(false));
 
         global_ask_timer_tick(&GLOBAL_DRIVER);
+
+        critical_section::with(|cs| {
+            if let Some(driver) = GLOBAL_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                driver.tx.done();
+                driver.rx.done();
+                let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+            }
+        });
     }
 
     #[test]
@@ -389,17 +415,44 @@ mod tests {
             global_ask_driver_init::<PinMock, PinMock, PinMock>();
         static TICKS: u8 = 8;
 
-        let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
+        let tx = PinMock::new(&[
+            PinTransaction::set(PinState::Low),
+            PinTransaction::set(PinState::Low),
+        ]);
         let rx = PinMock::new(&[]);
         let ptt = Some(PinMock::new(&[PinTransaction::set(PinState::High)]));
 
         global_ask_driver_setup(&GLOBAL_DRIVER, tx, rx, ptt, TICKS, Some(false), Some(false));
 
-        let mut msg: Vec<u8> = Vec::new();
+        for _ in 0..5 {
+            global_ask_timer_tick(&GLOBAL_DRIVER);
+        }
+
+        let mut msg = Vec::new();
+        #[cfg(not(feature = "std"))]
+        let _ = msg.extend_from_slice(b"Hello");
+        #[cfg(feature = "std")]
         msg.extend_from_slice(b"Hello");
+
         assert!(send_from_global_ask(&GLOBAL_DRIVER, msg));
+
+        for _ in 0..5 {
+            global_ask_timer_tick(&GLOBAL_DRIVER);
+        }
 
         let received = receive_from_global_ask(&GLOBAL_DRIVER);
         assert!(received.is_none()); // No message has been received yet
+
+        for _ in 0..5 {
+            global_ask_timer_tick(&GLOBAL_DRIVER);
+        }
+
+        critical_section::with(|cs| {
+            if let Some(driver) = GLOBAL_DRIVER.borrow(cs).borrow_mut().as_mut() {
+                driver.tx.done();
+                driver.rx.done();
+                let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+            }
+        });
     }
 }

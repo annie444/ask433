@@ -6,7 +6,6 @@ version = 4
 name = "ask433"
 version = "0.1.5"
 dependencies = [
- "ask433",
  "critical-section",
  "defmt 0.3.100",
  "embedded-hal 1.0.0",

@@ -29,10 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: "${{ matrix.toolchain }}"
-          components: "clippy, rustfmt"
+          components: clippy
       - uses: actions-rs/clippy-check@v1
         with:
           args: "--features ${{ matrix.features }} --all-targets"
@@ -50,9 +50,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: "${{ matrix.toolchain }}"
+          components: clippy
       - run: cargo test --all-targets --features std,delay-loop,timer-isr -vv
 
   build:
@@ -69,9 +70,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: "${{ matrix.toolchain }}"
+          components: clippy
       - name: Build features
         run: cargo build --features "${{ matrix.features }}" -vv
 
@@ -80,6 +82,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
       - name: Build docs with all features
         run: cargo doc --features timer-isr,delay-loop -vv

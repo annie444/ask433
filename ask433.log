@@ -1,0 +1,719 @@
+this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 0
+this_byte: 0
+b: 20, crc: 22818b: 255, crc: 3377b: 255, crc: 12159b: 0, crc: 35679b: 0, crc: 43769b: 72, crc: 42152b: 101, crc: 7501b: 108, crc: 12438b: 108, crc: 22757b: 111, crc: 11018b: 44, crc: 17439b: 32, crc: 51504b: 119, crc: 13938b: 111, crc: 52050b: 114, crc: 8649b: 108, crc: 62086b: 100, crc: 50414b: 33, crc: 15935b: 0, crc: 51530b: 0, crc: 60823b: 20, crc: 22818b: 255, crc: 3377b: 255, crc: 12159b: 0, crc: 35679b: 0, crc: 43769b: 72, crc: 42152b: 101, crc: 7501b: 108, crc: 12438b: 108, crc: 22757b: 111, crc: 11018b: 44, crc: 17439b: 32, crc: 51504b: 119, crc: 13938b: 111, crc: 52050b: 114, crc: 8649b: 108, crc: 62086b: 100, crc: 50414b: 33, crc: 15935b: 0, crc: 51530b: 0, crc: 60823this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 0
+this_byte: 0
+b: 20, crc: 22818, expected: 61624
+b: 255, crc: 3377, expected: 61624
+b: 255, crc: 12159, expected: 61624
+b: 0, crc: 35679, expected: 61624
+b: 0, crc: 43769, expected: 61624
+b: 72, crc: 42152, expected: 61624
+b: 101, crc: 7501, expected: 61624
+b: 108, crc: 12438, expected: 61624
+b: 108, crc: 22757, expected: 61624
+b: 111, crc: 11018, expected: 61624
+b: 44, crc: 17439, expected: 61624
+b: 32, crc: 51504, expected: 61624
+b: 119, crc: 13938, expected: 61624
+b: 111, crc: 52050, expected: 61624
+b: 114, crc: 8649, expected: 61624
+b: 108, crc: 62086, expected: 61624
+b: 100, crc: 50414, expected: 61624
+b: 33, crc: 15935, expected: 61624
+b: 0, crc: 51530, expected: 61624
+b: 0, crc: 60823, expected: 61624
+b: 20, crc: 22818, expected: 61624
+b: 255, crc: 3377, expected: 61624
+b: 255, crc: 12159, expected: 61624
+b: 0, crc: 35679, expected: 61624
+b: 0, crc: 43769, expected: 61624
+b: 72, crc: 42152, expected: 61624
+b: 101, crc: 7501, expected: 61624
+b: 108, crc: 12438, expected: 61624
+b: 108, crc: 22757, expected: 61624
+b: 111, crc: 11018, expected: 61624
+b: 44, crc: 17439, expected: 61624
+b: 32, crc: 51504, expected: 61624
+b: 119, crc: 13938, expected: 61624
+b: 111, crc: 52050, expected: 61624
+b: 114, crc: 8649, expected: 61624
+b: 108, crc: 62086, expected: 61624
+b: 100, crc: 50414, expected: 61624
+b: 33, crc: 15935, expected: 61624
+b: 0, crc: 51530, expected: 61624
+b: 0, crc: 60823, expected: 61624
+this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 192
+this_byte: 193
+b: 20, crc: 22818, expected: 61624
+b: 255, crc: 3377, expected: 61624
+b: 255, crc: 12159, expected: 61624
+b: 0, crc: 35679, expected: 61624
+b: 0, crc: 43769, expected: 61624
+b: 72, crc: 42152, expected: 61624
+b: 101, crc: 7501, expected: 61624
+b: 108, crc: 12438, expected: 61624
+b: 108, crc: 22757, expected: 61624
+b: 111, crc: 11018, expected: 61624
+b: 44, crc: 17439, expected: 61624
+b: 32, crc: 51504, expected: 61624
+b: 119, crc: 13938, expected: 61624
+b: 111, crc: 52050, expected: 61624
+b: 114, crc: 8649, expected: 61624
+b: 108, crc: 62086, expected: 61624
+b: 100, crc: 50414, expected: 61624
+b: 33, crc: 15935, expected: 61624
+b: 192, crc: 3910, expected: 61624
+b: 193, crc: 61624, expected: 61624
+b: 20, crc: 22818, expected: 61624
+b: 255, crc: 3377, expected: 61624
+b: 255, crc: 12159, expected: 61624
+b: 0, crc: 35679, expected: 61624
+b: 0, crc: 43769, expected: 61624
+b: 72, crc: 42152, expected: 61624
+b: 101, crc: 7501, expected: 61624
+b: 108, crc: 12438, expected: 61624
+b: 108, crc: 22757, expected: 61624
+b: 111, crc: 11018, expected: 61624
+b: 44, crc: 17439, expected: 61624
+b: 32, crc: 51504, expected: 61624
+b: 119, crc: 13938, expected: 61624
+b: 111, crc: 52050, expected: 61624
+b: 114, crc: 8649, expected: 61624
+b: 108, crc: 62086, expected: 61624
+b: 100, crc: 50414, expected: 61624
+b: 33, crc: 15935, expected: 61624
+b: 192, crc: 3910, expected: 61624
+b: 193, crc: 61624, expected: 61624
+this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 192
+this_byte: 193
+this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 192
+this_byte: 193
+this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 192
+this_byte: 193
+this_byte: 20
+this_byte: 255
+this_byte: 255
+this_byte: 0
+this_byte: 0
+this_byte: 72
+this_byte: 101
+this_byte: 108
+this_byte: 108
+this_byte: 111
+this_byte: 44
+this_byte: 32
+this_byte: 119
+this_byte: 111
+this_byte: 114
+this_byte: 108
+this_byte: 100
+this_byte: 33
+this_byte: 192
+this_byte: 193
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 19, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 87, buf_len 18
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19
+this_byte: 20, buf_len 0
+this_byte: 255, buf_len 1
+this_byte: 255, buf_len 2
+this_byte: 0, buf_len 3
+this_byte: 0, buf_len 4
+this_byte: 72, buf_len 5
+this_byte: 101, buf_len 6
+this_byte: 108, buf_len 7
+this_byte: 108, buf_len 8
+this_byte: 111, buf_len 9
+this_byte: 44, buf_len 10
+this_byte: 32, buf_len 11
+this_byte: 119, buf_len 12
+this_byte: 111, buf_len 13
+this_byte: 114, buf_len 14
+this_byte: 108, buf_len 15
+this_byte: 100, buf_len 16
+this_byte: 33, buf_len 17
+this_byte: 192, buf_len 18
+this_byte: 193, buf_len 19

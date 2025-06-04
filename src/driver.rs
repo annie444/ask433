@@ -17,13 +17,22 @@
 //!
 //! ## Example
 //!
-//! ```no_run
+//! ```rust
+//! # use embedded_hal_mock::eh1::digital::{Mock as Pin, State as PinState, Transaction as PinTransaction};
+//! # use embedded_hal::digital::OutputPin;
 //! use ask433::driver::AskDriver;
 //!
-//! let mut driver = AskDriver::new(tx_pin, rx_pin);
+//! fn main() {
+//!     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
+//!     # let rx_pin = Pin::new(&[]);
+//!     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
 //!
-//! loop {
-//!     driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
+//!     loop {
+//!         driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
+//!         # break; // For testing purposes
+//!     }
+//!     # driver.tx.done();
+//!     # driver.rx.done();
 //! }
 //! ```
 //!
@@ -42,7 +51,7 @@ use crate::consts::{ASK_MAX_BUF_LEN_USIZE, ASK_MAX_MESSAGE_LEN_USIZE};
 
 use crate::consts::{ASK_HEADER_LEN, ASK_MAX_MESSAGE_LEN, ASK_PREAMBLE_LEN, BROADCAST_ADDRESS};
 use crate::crc::crc_ccitt_update;
-use crate::encoding::encode_4b6b;
+use crate::encoding::{SYMBOLS, encode_4b6b};
 use crate::pll::SoftwarePLL;
 use embedded_hal::digital::{InputPin, OutputPin};
 use nb::block;
@@ -113,14 +122,22 @@ pub enum AskMode {
 ///
 /// ## Example
 ///
-/// ```no_run
+/// ```rust
+/// # use embedded_hal_mock::eh1::digital::{Mock as Pin, State as PinState, Transaction as PinTransaction};
+/// # use embedded_hal::digital::OutputPin;
 /// use ask433::driver::AskDriver;
 ///
-/// // Assume tx and rx implement OutputPin and InputPin, respectively
-/// let mut driver = AskDriver::new(tx, rx);
+/// fn main() {
+///     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
+///     # let rx_pin = Pin::new(&[]);
+///     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
 ///
-/// loop {
-///     driver.tick(); // Must be called ~every 62.5 µs
+///     loop {
+///         driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
+///         # break; // For testing purposes
+///     }
+///     # driver.tx.done();
+///     # driver.rx.done();
 /// }
 /// ```
 ///
@@ -160,22 +177,62 @@ where
     pub tx_buf: Vec<u8, ASK_MAX_BUF_LEN_USIZE>,
     this_address: u8,
     promiscuous: bool,
-    tx_header_to: u8,
-    tx_header_from: u8,
-    tx_header_id: u8,
-    tx_header_flags: u8,
-    rx_header_to: u8,
-    rx_header_from: u8,
-    rx_header_id: u8,
-    rx_header_flags: u8,
+
+    /// Destination address for the outgoing message header.
+    /// This field is used when preparing the `to` header byte during transmission.
+    pub tx_header_to: u8,
+
+    /// Source address for the outgoing message header.
+    /// Identifies the sender of the message (i.e., this device).
+    pub tx_header_from: u8,
+
+    /// Packet ID for the outgoing message.
+    /// Typically incremented per message to help receivers detect duplicates.
+    pub tx_header_id: u8,
+
+    /// Custom user-defined flags for the outgoing message.
+    /// Useful for acknowledgments, control bits, or application-specific use.
+    pub tx_header_flags: u8,
+
+    /// Destination address from the last received message.
+    /// Parsed from the incoming packet header.
+    pub rx_header_to: u8,
+
+    /// Source address from the last received message.
+    /// Indicates who sent the last valid message.
+    pub rx_header_from: u8,
+
+    /// Packet ID from the last received message.
+    /// Can be used to detect duplicate packets or correlate replies.
+    pub rx_header_id: u8,
+
+    /// Custom flags from the last received message.
+    /// Application-specific semantics (e.g., ACK bit, message type).
+    pub rx_header_flags: u8,
     ptt_inverted: bool,
-    tx_index: u8,
-    tx_bit: u8,
+
+    /// Index into the transmission buffer, pointing to the current symbol being transmitted.
+    /// Used by the internal state machine to track symbol progress.
+    pub(crate) tx_index: u8,
+
+    /// Current bit position within the current 6-bit symbol being transmitted (0–5).
+    /// After 6 bits, the driver moves to the next symbol.
+    pub(crate) tx_bit: u8,
+
     tx_sample: u8,
     tx_buf_len: u8,
-    tx_good: u16,
-    rx_bad: u16,
-    rx_good: u16,
+
+    /// Counter of successfully completed transmissions.
+    /// Incremented when the transmit buffer is sent in full and the driver returns to idle.
+    pub tx_good: u16,
+
+    /// Counter of failed or invalid received messages.
+    /// Typically incremented when a CRC check fails or an invalid header is detected.
+    pub rx_bad: u16,
+
+    /// Counter of successfully received and validated messages.
+    /// Incremented after a complete and CRC-valid packet is accepted.
+    pub rx_good: u16,
     rx_buf_valid: bool,
 }
 
@@ -214,6 +271,7 @@ where
             Some(ptt) => ptt,
             None => false,
         };
+        #[allow(unused_mut)]
         let mut tx = tx;
         let _ = tx.set_low(); // Ensure idle
         let mut tx_buf = Vec::new();
@@ -263,14 +321,14 @@ where
 
     fn write_tx(&mut self, mode: bool) {
         if mode {
-            let _ = self.tx.set_high();
+            self.tx.set_high().unwrap();
         } else {
-            let _ = self.tx.set_low();
+            self.tx.set_low().unwrap();
         }
     }
 
     fn write_ptt(&mut self, mode: bool) {
-        let state = mode ^ self.ptt_inverted;
+        let state = if self.ptt_inverted { !mode } else { mode };
         if let Some(ref mut ptt) = self.ptt {
             if state {
                 let _ = ptt.set_high();
@@ -280,7 +338,8 @@ where
         }
     }
 
-    fn set_mode_idle(&mut self) {
+    /// Sets the driver into sleep mode.
+    pub fn set_mode_idle(&mut self) {
         if self.mode != AskMode::Idle {
             self.write_ptt(false);
             self.write_tx(false);
@@ -288,7 +347,8 @@ where
         }
     }
 
-    fn set_mode_rx(&mut self) {
+    /// Sets the driver into receive mode.
+    pub fn set_mode_rx(&mut self) {
         if self.mode != AskMode::Rx {
             self.write_ptt(false);
             self.write_tx(false);
@@ -296,7 +356,8 @@ where
         }
     }
 
-    fn set_mode_tx(&mut self) {
+    /// Sets the driver into transmit mode.
+    pub fn set_mode_tx(&mut self) {
         if self.mode != AskMode::Tx {
             self.tx_index = 0;
             self.tx_bit = 0;
@@ -440,7 +501,7 @@ where
             return None;
         }
 
-        let message_len: u8 = self.pll.buf_len - ASK_HEADER_LEN - 3;
+        let message_len: u8 = self.pll.buf_len - 2;
         self.rx_buf_valid = false;
         let message =
             Vec::from_slice(&self.pll.buf[((ASK_HEADER_LEN + 1) as usize)..(message_len as usize)])
@@ -482,10 +543,10 @@ where
             return None;
         }
 
-        let message_len: u8 = self.pll.buf_len - ASK_HEADER_LEN - 3;
+        let message_len: u8 = self.pll.buf_len - 2;
         self.rx_buf_valid = false;
         let message =
-            Vec::from(&self.pll.buf[((ASK_HEADER_LEN + 1) as usize)..(message_len as usize)]);
+            Vec::from(&self.pll.buf[(ASK_HEADER_LEN + 1) as usize..(message_len as usize)]);
         Some(message)
     }
 
@@ -570,10 +631,10 @@ where
         // Caution: VW expects the _ones_complement_ of the CCITT CRC-16 as the FCS
         // VW sends FCS as low byte then hi byte
         crc = !crc;
-        let _ = self.tx_buf.push(((crc >> 4) & 0xf) as u8);
-        let _ = self.tx_buf.push((crc & 0xf) as u8);
-        let _ = self.tx_buf.push(((crc >> 12) & 0xf) as u8);
-        let _ = self.tx_buf.push(((crc >> 8) & 0xf) as u8);
+        let _ = self.tx_buf.push(SYMBOLS[((crc >> 4) & 0xf) as usize]);
+        let _ = self.tx_buf.push(SYMBOLS[(crc & 0xf) as usize]);
+        let _ = self.tx_buf.push(SYMBOLS[((crc >> 12) & 0xf) as usize]);
+        let _ = self.tx_buf.push(SYMBOLS[((crc >> 8) & 0xf) as usize]);
 
         // Total number of 6-bit symbols to send
         self.tx_buf_len = self.tx_buf.len() as u8;
@@ -628,10 +689,10 @@ where
         // Caution: VW expects the _ones_complement_ of the CCITT CRC-16 as the FCS
         // VW sends FCS as low byte then hi byte
         crc = !crc;
-        let _ = self.tx_buf.push(((crc >> 4) & 0xf) as u8);
-        let _ = self.tx_buf.push((crc & 0xf) as u8);
-        let _ = self.tx_buf.push(((crc >> 12) & 0xf) as u8);
-        let _ = self.tx_buf.push(((crc >> 8) & 0xf) as u8);
+        let _ = self.tx_buf.push(SYMBOLS[((crc >> 4) & 0xf) as usize]);
+        let _ = self.tx_buf.push(SYMBOLS[(crc & 0xf) as usize]);
+        let _ = self.tx_buf.push(SYMBOLS[((crc >> 12) & 0xf) as usize]);
+        let _ = self.tx_buf.push(SYMBOLS[((crc >> 8) & 0xf) as usize]);
 
         // Total number of 6-bit symbols to send
         self.tx_buf_len = self.tx_buf.len() as u8;
@@ -655,10 +716,9 @@ where
         // Finished sending the whole message? (after waiting one bit period
         // since the last bit)
         if self.tx_index >= self.tx_buf_len {
-            self.set_mode_idle();
             self.tx_good += 1;
+            self.set_mode_idle();
         } else {
-            self.tx_bit += 1;
             // bit = bit_to_send (Bitwise AND) (1 (Bitwise shift Left) tx_bit)
             // e.g. for bit_to_send = 4 = 00000100
             // tx_bit = 6
@@ -668,15 +728,139 @@ where
             // 0000001 (1) << 3 = 0001000 (8)
             // 0001000 & 0001000 = 0001000 (8 = true)
             let bit = self.tx_buf[self.tx_index as usize] & (1 << self.tx_bit);
-            if bit == 0 {
-                self.write_tx(false);
-            } else {
-                self.write_tx(true);
-            }
+            self.tx_bit += 1;
+            self.write_tx(bit != 0);
             if self.tx_bit >= 6 {
                 self.tx_bit = 0;
                 self.tx_index += 1;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use embedded_hal_mock::eh1::digital::{
+        Mock as PinMock, State as PinState, Transaction as PinTransaction,
+    };
+
+    #[test]
+    fn test_driver_initialization() {
+        let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
+        let rx = PinMock::new(&[]);
+        let ptt = PinMock::new(&[]);
+
+        let mut driver = AskDriver::new(tx, rx, Some(ptt), 8, Some(false), Some(false));
+
+        assert_eq!(driver.mode, AskMode::Idle);
+        driver.tx.done();
+        driver.rx.done();
+        let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+    }
+
+    #[test]
+    fn test_set_address() {
+        let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
+        let rx = PinMock::new(&[]);
+        let ptt = PinMock::new(&[]);
+        let mut driver = AskDriver::new(tx, rx, Some(ptt), 8, Some(false), Some(false));
+
+        driver.set_address(0x42);
+        assert_eq!(driver.this_address, 0x42);
+        driver.tx.done();
+        driver.rx.done();
+        let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+    }
+
+    #[test]
+    fn test_send_message_starts_transmission() {
+        let tx = PinMock::new(&[PinTransaction::set(PinState::Low)]);
+        let rx = PinMock::new(&[]);
+        let ptt = PinMock::new(&[PinTransaction::set(PinState::High)]);
+
+        let mut driver = AskDriver::new(tx, rx, Some(ptt), 8, Some(false), Some(false));
+        let mut message: Vec<u8> = Vec::new();
+        message.extend_from_slice(b"Hi");
+
+        assert!(driver.send(message));
+        assert_eq!(driver.mode, AskMode::Tx);
+        assert_eq!(driver.tx_buf.len(), 26); // (2 bytes + 4 headers + 1 count + 2 CRC bytes) * 2 (4b6b encoding) + 8 (preamble)
+        driver.tx.done();
+        driver.rx.done();
+        let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+    }
+
+    #[test]
+    fn test_tick_transmit_advances_tx_state() {
+        let tx_states = vec![
+            0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+            0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1,
+            0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0,
+            1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0,
+            1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0,
+            0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0,
+        ];
+        let tx = PinMock::new(
+            &tx_states
+                .iter()
+                .map(|&s| {
+                    PinTransaction::set(if s == 0 {
+                        PinState::Low
+                    } else {
+                        PinState::High
+                    })
+                })
+                .collect::<Vec<_>>(),
+        );
+        let rx = PinMock::new(&[]);
+        let ptt = PinMock::new(&[
+            PinTransaction::set(PinState::High),
+            PinTransaction::set(PinState::Low),
+        ]);
+
+        let mut driver = AskDriver::new(tx, rx, Some(ptt), 2, Some(false), Some(false));
+        let mut message: Vec<u8> = Vec::new();
+        message.extend_from_slice(b"AB");
+        assert!(driver.send(message));
+
+        assert_eq!(
+            driver.tx_buf,
+            vec![
+                42, 42, 42, 42, 42, 42, 56, 44, 13, 37, 52, 52, 52, 52, 13, 13, 13, 13, 22, 14, 22,
+                19, 37, 14, 52, 41
+            ]
+        );
+
+        assert!(driver.mode == AskMode::Tx);
+
+        for _ in 0..(tx_states.len() * 3) {
+            // 2 ticks per bit
+            driver.tick();
+        }
+
+        assert_eq!(driver.tx_buf_len, 26);
+        assert_eq!(driver.tx_good, 1);
+        assert_eq!(driver.tx_index, 26);
+        driver.tx.done();
+        driver.rx.done();
+        let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
+    }
+
+    #[test]
+    fn test_receive_no_data_returns_none() {
+        let tx = PinMock::new(&[
+            PinTransaction::set(PinState::Low),
+            PinTransaction::set(PinState::Low),
+        ]);
+        let rx = PinMock::new(&[]);
+        let ptt = PinMock::new(&[PinTransaction::set(PinState::Low)]);
+
+        let mut driver = AskDriver::new(tx, rx, Some(ptt), 8, Some(false), Some(false));
+        assert!(!driver.availabile());
+        assert!(driver.receive().is_none());
+        driver.tx.done();
+        driver.rx.done();
+        let _ = driver.ptt.as_mut().map(|ptt| ptt.done());
     }
 }

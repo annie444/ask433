@@ -12,7 +12,7 @@ documentation = "https://docs.rs/ask433"
 keywords = ["hal", "IO"]
 
 [features]
-std = []
+std = ["thiserror/std", "critical-section/std", "log/std"]
 delayus-loop = []
 timer-isr = ["dep:critical-section"]
 defmt-0-3 = [
@@ -37,6 +37,9 @@ critical-section = { version = "1.2.0", optional = true }
 heapless = { version = "0.8.0", optional = true }
 libm = "0.2.15"
 nb = "1.1.0"
+thiserror = { version = "2.0.12", default-features = false }
 
 [dev-dependencies]
-embedded-hal-mock = "0.11.1"
+embedded-hal-mock = { version = "0.11.1", features = ["eh1"] }
+ask433 = { path = ".", features = ["std"] }
+critical-section = { version = "1.2.0", features = ["restore-state-bool"] }

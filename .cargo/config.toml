@@ -1,0 +1,3 @@
+[build]
+rustflags = ["-Zmacro-backtrace"]
+rustdocflags = ["-Zmacro-backtrace"]

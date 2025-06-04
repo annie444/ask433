@@ -39,79 +39,14 @@
 //! - Only valid encoded 6-bit symbols are supported; decoding invalid values returns `None`
 //! - Input to `decode_buffer` must be even-length; symbol pairs are required
 
-static SYMBOLS: [u8; 16] = [
+/// 4b6b encoding symbol table.
+pub static SYMBOLS: [u8; 16] = [
     0xd, 0xe, 0x13, 0x15, 0x16, 0x19, 0x1a, 0x1c, 0x23, 0x25, 0x26, 0x29, 0x2a, 0x2c, 0x32, 0x34,
-];
-static REV_SYMBOLS: [Option<u8>; 64] = [
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    Some(0),
-    Some(1),
-    None,
-    None,
-    None,
-    None,
-    Some(2),
-    None,
-    Some(3),
-    Some(4),
-    None,
-    None,
-    Some(5),
-    Some(6),
-    None,
-    Some(7),
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    Some(8),
-    None,
-    Some(9),
-    Some(10),
-    None,
-    None,
-    Some(11),
-    Some(12),
-    None,
-    Some(13),
-    None,
-    None,
-    None,
-    None,
-    None,
-    Some(14),
-    None,
-    Some(15),
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
 ];
 
 /// Encodes an 8-bit byte into two 6-bit symbols using 4b6b encoding.
 pub fn encode_4b6b(byte: u8) -> [u8; 2] {
-    let high = (byte >> 4) & 0x0F;
+    let high = byte >> 4;
     let low = byte & 0x0F;
     [SYMBOLS[high as usize], SYMBOLS[low as usize]]
 }
@@ -119,10 +54,10 @@ pub fn encode_4b6b(byte: u8) -> [u8; 2] {
 /// Decodes two 6-bit symbols back into the original byte using the reverse symbol table.
 ///
 /// Returns `None` if either symbol is invalid (not part of the encoding table).
-pub fn decode_6b4b(sym_hi: u8, sym_lo: u8) -> Option<u8> {
-    let high = REV_SYMBOLS.get(sym_hi as usize)?.clone()?;
-    let low = REV_SYMBOLS.get(sym_lo as usize)?.clone()?;
-    Some((high << 4) | low)
+pub fn decode_6b4b(symbol1: &u8, symbol2: &u8) -> u8 {
+    let b1 = SYMBOLS.iter().position(|s| s == symbol1).unwrap_or(0) as u8;
+    let b2 = SYMBOLS.iter().position(|s| s == symbol2).unwrap_or(0) as u8;
+    (b1 << 4) | b2
 }
 
 /// Encodes an array of 8-bit bytes into the array `output` as 6-bit symbols using 4b6b encoding.
@@ -133,15 +68,12 @@ pub fn decode_6b4b(sym_hi: u8, sym_lo: u8) -> Option<u8> {
 ///
 /// # Returns
 /// The length of the encoded array
-pub fn encode_buffer(input: &[u8], output: &mut [u8]) -> usize {
-    let mut i = 0;
+pub fn encode_buffer(input: &[u8]) -> Vec<u8> {
+    let mut output = Vec::with_capacity(input.len() * 2);
     for &byte in input {
-        let [hi, lo] = encode_4b6b(byte);
-        output[i] = hi;
-        output[i + 1] = lo;
-        i += 2;
+        output.extend_from_slice(&encode_4b6b(byte));
     }
-    i
+    output
 }
 
 /// Decodes an array of 6-bit symbol pairs back into the original byte using the reverse symbol table.
@@ -154,18 +86,57 @@ pub fn encode_buffer(input: &[u8], output: &mut [u8]) -> usize {
 /// The optional length of the output buffer.
 /// Returns `None` if the input buffer is an uneven length. (As the 6-bit encoded data comes in
 /// pairs.)
-pub fn decode_buffer(input: &[u8], output: &mut [u8]) -> Option<usize> {
-    let mut i = 0;
+pub fn decode_buffer(input: &[u8]) -> Vec<u8> {
+    let mut output: Vec<u8> = Vec::with_capacity(input.len() / 2);
     if input.len() % 2 != 0 {
-        return None;
+        return Vec::new(); // Invalid input length
     }
     for chunk in input.chunks(2) {
-        if chunk.len() < 2 {
-            return None;
-        }
-        let byte = decode_6b4b(chunk[0], chunk[1])?;
-        output[i] = byte;
-        i += 1;
+        output.push(decode_6b4b(&chunk[0], &chunk[1]));
     }
-    Some(i)
+    output
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_encode_4b6b_correct_output() {
+        let encoded = encode_4b6b(0xAB); // 0xA = 10, 0xB = 11
+        assert_eq!(encoded[0], 0x26);
+        assert_eq!(encoded[1], 0x29);
+    }
+
+    #[test]
+    fn test_decode_6b4b_correct_output() {
+        let decoded = decode_6b4b(&0b10101, &0b1101);
+        assert_eq!(decoded, 0b110000);
+    }
+
+    #[test]
+    fn test_encode_buffer_correct_length_and_content() {
+        let input = [0xAB, 0xCD];
+        let output = encode_buffer(&input);
+        assert_eq!(output.len(), 4);
+        assert_eq!(output[0], 0x26);
+        assert_eq!(output[1], 0x29);
+        assert_eq!(output[2], 0x2a);
+        assert_eq!(output[3], 0x2c);
+    }
+
+    #[test]
+    fn test_decode_buffer_successful() {
+        let input = [0x26, 0x29];
+        let output = decode_buffer(&input);
+        assert_eq!(output.len(), 1);
+        assert_eq!(output[0], 0xAB);
+    }
+
+    #[test]
+    fn test_decode_buffer_odd_length_fails() {
+        let input = [0x2a];
+        let result = decode_buffer(&input);
+        assert_eq!(result, vec![]);
+    }
 }

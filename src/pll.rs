@@ -107,7 +107,6 @@ pub struct SoftwarePLL {
     #[cfg(feature = "std")]
     pub buf: Vec<u8>,
 }
-
 impl SoftwarePLL {
     /// Creates a new, zeroed software PLL instance.
     ///
@@ -147,7 +146,11 @@ impl SoftwarePLL {
     /// - `rx`: Input pin to sample
     pub fn update<RX: InputPin>(&mut self, rx: &mut RX) {
         // Poll the current state
-        let sample = rx.is_high().unwrap_or(false) ^ self.inverted;
+        let sample = if self.inverted {
+            !rx.is_high().unwrap_or(false)
+        } else {
+            rx.is_high().unwrap_or(false)
+        };
         // Ensure we're integrating each sample
         if sample {
             self.integrator += 1;
@@ -191,8 +194,20 @@ impl SoftwarePLL {
                     // Have 12 bits of encoded message == 1 byte encoded
                     // Decode as 2 lots of 6 bits into 2 lots of 4 bits
                     // The 6 lsbits are the high nybble
-                    let this_byte: Option<u8> =
-                        decode_6b4b((self.bits & 0x3f) as u8, (self.bits >> 6) as u8);
+                    let this_byte =
+                        decode_6b4b(&((self.bits & 0x3f) as u8), &((self.bits >> 6) as u8));
+                    use std::io::Write;
+                    std::fs::File::options()
+                        .write(true)
+                        .append(true)
+                        .create(true)
+                        .open("ask433.log")
+                        .expect("Failed to create log file")
+                        .write_all(
+                            format!("this_byte: {}, buf_len {}\n", this_byte, self.buf_len)
+                                .as_bytes(),
+                        )
+                        .expect("Failed to write to log file");
 
                     // The first decoded byte is the byte count of the following message
                     // the count includes the byte count and the 2 trailing FCS bytes
@@ -201,7 +216,7 @@ impl SoftwarePLL {
                         // The first byte is the byte count
                         // Check it for sensibility. It cant be less than 7, since it
                         // includes the byte count itself, the 4 byte header and the 2 byte FCS
-                        self.count = this_byte.unwrap();
+                        self.count = this_byte;
                         if self.count < 7 || self.count > ASK_MAX_PAYLOAD_LEN {
                             // Stupid message length, drop the whole thing
                             self.active = false;
@@ -209,8 +224,8 @@ impl SoftwarePLL {
                             return;
                         }
                     }
+                    self.buf.push(this_byte);
                     self.buf_len += 1;
-                    self.buf[self.buf_len as usize] = this_byte.unwrap();
 
                     if self.buf_len >= self.count {
                         // Got all the bytes now
@@ -225,5 +240,65 @@ impl SoftwarePLL {
                 self.buf_len = 0;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use embedded_hal_mock::eh1::digital::{
+        Mock as PinMock, State as PinState, Transaction as PinTransaction,
+    };
+
+    #[test]
+    fn test_pll_initialization_defaults() {
+        let pll = SoftwarePLL::new(8, false);
+        assert_eq!(pll.ramp, 0);
+        assert_eq!(pll.integrator, 0);
+        assert_eq!(pll.bit_count, 0);
+        assert_eq!(pll.active, false);
+        assert_eq!(pll.full, false);
+        assert_eq!(pll.buf_len, 0);
+    }
+
+    #[test]
+    fn test_pll_updates_on_tick_with_high_signal() {
+        let expectations = [PinTransaction::get(PinState::High)];
+        let mut rx = PinMock::new(&expectations);
+
+        let mut pll = SoftwarePLL::new(8, false);
+        pll.update(&mut rx);
+
+        // Should increment integrator if sample was high
+        assert!(pll.integrator > 0);
+        rx.done();
+    }
+
+    #[test]
+    fn test_pll_detects_start_symbol() {
+        let mut pll = SoftwarePLL::new(8, false);
+        pll.bits = ASK_START_SYMBOL << 1; // Shifted to simulate previous bits
+        pll.ramp = pll.ramp_len;
+
+        // Should detect start symbol and set active
+        let expectations = [PinTransaction::get(PinState::High)];
+        let mut rx = PinMock::new(&expectations);
+        pll.update(&mut rx);
+
+        assert!(pll.active);
+        rx.done();
+    }
+
+    #[test]
+    fn test_pll_inverts_signal_when_flagged() {
+        let expectations = [PinTransaction::get(PinState::High)];
+        let mut rx = PinMock::new(&expectations);
+
+        let mut pll = SoftwarePLL::new(8, true);
+        pll.update(&mut rx);
+
+        // Inverted high is low: integrator should remain zero
+        assert_eq!(pll.integrator, 0);
+        rx.done();
     }
 }

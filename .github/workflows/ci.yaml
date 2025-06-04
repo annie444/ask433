@@ -73,7 +73,7 @@ jobs:
         with:
           toolchain: "${{ matrix.toolchain }}"
       - name: Build features
-        run: cargo build --features "${{ matrix.features }}"
+        run: cargo build --features "${{ matrix.features }}" --verbose
 
   doc:
     name: Build Documentation
@@ -82,4 +82,4 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Build docs with all features
-        run: cargo doc --features timer-isr,delay-loop
+        run: cargo doc --features timer-isr,delay-loop --verbose

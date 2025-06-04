@@ -17,7 +17,7 @@ targets := "aarch64-apple-darwin x86_64-unknown-linux-gnu x86_64-unknown-linux-m
   thumbv7em-none-eabi thumbv7em-none-eabihf \
   thumbv7m-none-eabi thumbv8m.base-none-eabi \
   thumbv8m.main-none-eabi thumbv8m.main-none-eabihf \
-  armv8r-none-eabihf riscv32em-unknown-none-elf \
+  armv8r-none-eabihf \
   riscv32emc-unknown-none-elf riscv32gc-unknown-linux-gnu \
   riscv32gc-unknown-linux-musl riscv32ima-unknown-none-elf \
   riscv32imac-esp-espidf riscv32imafc-esp-espidf \
@@ -25,7 +25,7 @@ targets := "aarch64-apple-darwin x86_64-unknown-linux-gnu x86_64-unknown-linux-m
   xtensa-esp32-espidf xtensa-esp32-none-elf \
   xtensa-esp32s2-espidf xtensa-esp32s2-none-elf \
   xtensa-esp32s3-espidf xtensa-esp32s3-none-elf"
-no_std := "armv8r-none-eabihf"
+no_std := "armv8r-none-eabihf riscv32emc-unknown-none-elf riscv32gc-unknown-linux-gnu riscv32gc-unknown-linux-musl"
 bold_cyan := '\033[1;36m'
 reset := '\033[0m'
 

@@ -211,6 +211,9 @@ impl SoftwarePLL {
                             return;
                         }
                     }
+                    #[cfg(not(feature = "std"))]
+                    let _ = self.buf.push(this_byte);
+                    #[cfg(feature = "std")]
                     self.buf.push(this_byte);
                     self.buf_len += 1;
 

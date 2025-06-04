@@ -47,6 +47,9 @@ pub const ASK_HEADER_LEN: u8 = 4;
 /// This includes everything before symbol encoding (4b6b).
 pub const ASK_MAX_PAYLOAD_LEN: u8 = 67;
 
+/// See [`ASK_MAX_PAYLOAD_LEN`](crate::consts::ASK_MAX_PAYLOAD_LEN)
+pub const ASK_MAX_PAYLOAD_LEN_USIZE: usize = ASK_MAX_PAYLOAD_LEN as usize;
+
 /// Length (in bytes) of the transmitted preamble used to train the receiver PLL.
 ///
 /// Each byte is encoded as two 6-bit symbols during transmission.

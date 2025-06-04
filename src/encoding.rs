@@ -39,6 +39,13 @@
 //! - Only valid encoded 6-bit symbols are supported; decoding invalid values returns `None`
 //! - Input to `decode_buffer` must be even-length; symbol pairs are required
 
+#[cfg(not(feature = "std"))]
+use crate::consts::{ASK_MAX_BUF_LEN_USIZE, ASK_MAX_PAYLOAD_LEN_USIZE};
+#[cfg(not(feature = "std"))]
+use heapless::Vec;
+#[cfg(feature = "std")]
+use std::vec::Vec;
+
 /// 4b6b encoding symbol table.
 pub static SYMBOLS: [u8; 16] = [
     0xd, 0xe, 0x13, 0x15, 0x16, 0x19, 0x1a, 0x1c, 0x23, 0x25, 0x26, 0x29, 0x2a, 0x2c, 0x32, 0x34,
@@ -68,10 +75,28 @@ pub fn decode_6b4b(symbol1: &u8, symbol2: &u8) -> u8 {
 ///
 /// # Returns
 /// The length of the encoded array
+#[cfg(feature = "std")]
 pub fn encode_buffer(input: &[u8]) -> Vec<u8> {
     let mut output = Vec::with_capacity(input.len() * 2);
     for &byte in input {
         output.extend_from_slice(&encode_4b6b(byte));
+    }
+    output
+}
+
+/// Encodes an array of 8-bit bytes into the array `output` as 6-bit symbols using 4b6b encoding.
+///
+/// # Arguments
+/// - `&[u8]` : The input buffer slice
+/// - `&mut [u8]` : The output buffer
+///
+/// # Returns
+/// The length of the encoded array
+#[cfg(not(feature = "std"))]
+pub fn encode_buffer(input: &[u8]) -> Vec<u8, ASK_MAX_BUF_LEN_USIZE> {
+    let mut output = Vec::new();
+    for &byte in input {
+        let _ = output.extend_from_slice(&encode_4b6b(byte));
     }
     output
 }
@@ -86,13 +111,36 @@ pub fn encode_buffer(input: &[u8]) -> Vec<u8> {
 /// The optional length of the output buffer.
 /// Returns `None` if the input buffer is an uneven length. (As the 6-bit encoded data comes in
 /// pairs.)
+#[cfg(feature = "std")]
 pub fn decode_buffer(input: &[u8]) -> Vec<u8> {
-    let mut output: Vec<u8> = Vec::with_capacity(input.len() / 2);
     if input.len() % 2 != 0 {
         return Vec::new(); // Invalid input length
     }
+    let mut output: Vec<u8> = Vec::with_capacity(input.len() / 2);
     for chunk in input.chunks(2) {
         output.push(decode_6b4b(&chunk[0], &chunk[1]));
+    }
+    output
+}
+
+/// Decodes an array of 6-bit symbol pairs back into the original byte using the reverse symbol table.
+///
+/// # Arguments
+/// - `&[u8]` : The input buffer slice
+/// - `&mut [u8]` : The output buffer
+///
+/// # Returns
+/// The optional length of the output buffer.
+/// Returns `None` if the input buffer is an uneven length. (As the 6-bit encoded data comes in
+/// pairs.)
+#[cfg(not(feature = "std"))]
+pub fn decode_buffer(input: &[u8]) -> Vec<u8, ASK_MAX_PAYLOAD_LEN_USIZE> {
+    if input.len() % 2 != 0 {
+        return Vec::new(); // Invalid input length
+    }
+    let mut output = Vec::new();
+    for chunk in input.chunks(2) {
+        let _ = output.push(decode_6b4b(&chunk[0], &chunk[1]));
     }
     output
 }

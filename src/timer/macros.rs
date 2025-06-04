@@ -16,7 +16,7 @@
 /// use embedded_hal_mock::eh1::digital::{Mock as Pin};
 /// init_ask_driver!(Pin, Pin, Pin);
 /// ```
-#[macro_export]
+#[cfg_attr(feature = "timer-isr", macro_export)]
 macro_rules! init_ask_driver {
     ($tx:ty, $rx:ty, $ptt:ty) => {
         #[allow(unused)]
@@ -62,7 +62,7 @@ macro_rules! init_ask_driver {
 /// # Notes
 /// - Must be called inside a critical section-aware context (safe in `main()`).
 /// - Requires `init_ask_driver!` to have been used earlier.
-#[macro_export]
+#[cfg_attr(feature = "timer-isr", macro_export)]
 macro_rules! setup_ask_driver {
     ( $tx:expr, $rx:expr, $ptt:expr, $ticks_per_bit:expr, $ptt_inverted:expr, $rx_inverted:expr ) => {
         $crate::critical_section::with(|cs| {
@@ -99,7 +99,7 @@ macro_rules! setup_ask_driver {
 /// - This macro assumes `ASK_DRIVER` was declared with `init_ask_driver!`
 ///   and initialized via `setup_ask_driver!`.
 /// - Safe to call repeatedly — will silently do nothing if the driver hasn't been set up yet.
-#[macro_export]
+#[cfg_attr(feature = "timer-isr", macro_export)]
 macro_rules! tick_ask_timer {
     () => {
         $crate::critical_section::with(|cs| {
@@ -140,7 +140,7 @@ macro_rules! tick_ask_timer {
 ///     }
 /// }
 /// ```
-#[macro_export]
+#[cfg_attr(feature = "timer-isr", macro_export)]
 macro_rules! receive_from_ask {
     () => {
         $crate::critical_section::with(|cs| {
@@ -189,7 +189,7 @@ macro_rules! receive_from_ask {
 /// }
 /// ```
 #[cfg(not(feature = "std"))]
-#[macro_export]
+#[cfg_attr(all(feature = "timer-isr", not(feature = "std")), macro_export)]
 macro_rules! send_from_ask {
     ($elem:expr) => {
         $crate::critical_section::with(|cs| {
@@ -260,7 +260,7 @@ macro_rules! send_from_ask {
 /// }
 /// ```
 #[cfg(feature = "std")]
-#[macro_export]
+#[cfg_attr(all(feature = "timer-isr", feature = "std"), macro_export)]
 macro_rules! send_from_ask {
     ($elem:expr) => {
         $crate::critical_section::with(|cs| {

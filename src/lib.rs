@@ -113,9 +113,10 @@
 )]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(feature = "timer-isr")]
 pub use critical_section;
 
-#[cfg(not(feature = "std"))]
+#[cfg(all(feature = "timer-isr", not(feature = "std")))]
 pub use heapless;
 
 pub mod consts;

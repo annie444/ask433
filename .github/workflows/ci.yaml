@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: Lint and Format
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - nightly
+        features:
+          - "delayus-loop,timer-isr"
+          - "std,delayus-loop,timer-isr"
+    steps:
+      - uses: actions/checkout@v4
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "${{ matrix.toolchain }}"
+          components: "clippy, rustfmt"
+      - uses: actions-rs/clippy-check@v1
+        with:
+          args: "--verbose --features ${{ matrix.features }} --all-targets"
+          name: "clippy-check-${{ matrix.toolchain }}-${{ matrix.features }}"
+
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "${{ matrix.toolchain }}"
+          components: "clippy, rustfmt"
+      - run: cargo test --all-targets --features std,delayus-loop,timer-isr --verbose
+
+  build:
+    name: Build features
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - nightly
+        features:
+          - "delayus-loop,timer-isr"
+          - "std,delayus-loop,timer-isr"
+    steps:
+      - uses: actions/checkout@v4
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "${{ matrix.toolchain }}"
+          components: "clippy, rustfmt"
+      - name: Build features
+        run: cargo build --features "${{ matrix.features }}"
+  doc:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build docs with all features
+        run: cargo doc --features timer-isr,delayus-loop

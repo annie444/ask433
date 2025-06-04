@@ -14,7 +14,7 @@
 //! |-----------------------|-------------|
 //! | `std`                 | Disables `#![no_std]` support and replaces `healpess::Vec`s with
 //! `std::vec::Vec`s |
-//! | `delayus-loop`        | Uses `embedded_hal::blocking::delay::DelayUs` for bit timing |
+//! | `delay-loop`        | Uses `embedded_hal::blocking::delay::DelayUs` for bit timing |
 //! | `timer-isr` (default) | Uses `critical_section::with` for bit timing |
 //! | `defmt`               | Uses `defmt` logging |
 //! | `log`                 | Uses `log` logging |
@@ -52,7 +52,7 @@
 //!
 //! ```rust
 //! use ask433::driver::AskDriver;
-//! # #[cfg(feature = "delayus-loop")]
+//! # #[cfg(feature = "delay-loop")]
 //! use ask433::timer::delay::run_ask_tick_loop;
 //! # use embedded_hal_mock::eh1::digital::{Mock as Pin, Transaction as PinTransaction, State as PinState};
 //! # use embedded_hal_mock::eh1::delay::NoopDelay as Delay;
@@ -63,9 +63,9 @@
 //!     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
 //!     # let rx_pin = Pin::new(&[]);
 //!     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
-//! # #[cfg(feature = "delayus-loop")]                                                      // ^ this is the number of interrupts per bit
+//! # #[cfg(feature = "delay-loop")]                                                      // ^ this is the number of interrupts per bit
 //!     # let mut delay = Delay::new();
-//! # #[cfg(feature = "delayus-loop")]
+//! # #[cfg(feature = "delay-loop")]
 //!     run_ask_tick_loop(&mut driver, &mut delay, 63);
 //!     # driver.tx.done();
 //!     # driver.rx.done();
@@ -75,7 +75,7 @@
 //! ## Feature Flags
 //!
 //! - `timer-isr`: Use a hardware timer ISR to call `tick()` (requires platform-specific ISR setup)
-//! - `delayus-loop`: Use a blocking loop to drive `tick()` with `embedded_hal::blocking::delay::DelayUs`
+//! - `delay-loop`: Use a blocking loop to drive `tick()` with `embedded_hal::blocking::delay::DelayUs`
 //!
 //! ## Integration Notes
 //!

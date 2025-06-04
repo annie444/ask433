@@ -2,12 +2,12 @@
 //!
 //! Logic for setting up the RF timer/clock. This employs two approaches: an interrupt service
 //! routine using `critical_section::with` (`timer-isr` feature), or a busy-loop delay timer
-//! (`delayus-loop` feature).
+//! (`delay-loop` feature).
 //!
 //! Contains helpers for polling- and ISR-based scheduling, including:
 //! - `compute_ocr_value`: runtime OCR calculator
 //! - `const_ocr_value`: compile-time OCR calculator
-//! - `run_ask_tick_loop`: blocking driver loop for DelayUs (feature `delayus-loop`)
+//! - `run_ask_tick_loop`: blocking driver loop for DelayUs (feature `delay-loop`)
 //! - `global_ask_timer_tick` and `tick_ask_timer!()`: interrupt-based tick callback wrapper
 //! (feature `timer-isr`)
 //!
@@ -23,10 +23,10 @@
 
 use libm::round;
 
-#[cfg(feature = "delayus-loop")]
+#[cfg(feature = "delay-loop")]
 mod delay;
-#[cfg_attr(feature = "delayus-loop", allow(unused_imports))]
-#[cfg(feature = "delayus-loop")]
+#[cfg_attr(feature = "delay-loop", allow(unused_imports))]
+#[cfg(feature = "delay-loop")]
 pub use delay::*;
 
 #[cfg(feature = "timer-isr")]

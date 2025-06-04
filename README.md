@@ -59,7 +59,7 @@ loop {
 | RTIC              | ✅     | Compatible via tick() ISR                           |
 
 You can use either:
-• `delayus-loop`: a blocking loop to call `tick()`
+• `delay-loop`: a blocking loop to call `tick()`
 • `timer-isr`: an interrupt handler that calls `tick()`
 
 See `src/timer.rs` for examples.

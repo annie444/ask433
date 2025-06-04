@@ -119,7 +119,7 @@ macro_rules! tick_ask_timer {
 ///
 /// # Requirements
 /// - The global `ASK_DRIVER` instance must have been initialized using
-///   [`init_global_ask_driver!`] and [`setup_global_ask_driver!`].
+///   [`init_ask_driver!`](crate::init_ask_driver) and [`setup_ask_driver!`](crate::setup_ask_driver).
 /// - Must be called in a context where `critical_section` is available and safe to use.
 ///
 /// # Returns

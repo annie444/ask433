@@ -47,7 +47,7 @@ pub const ASK_HEADER_LEN: u8 = 4;
 /// This includes everything before symbol encoding (4b6b).
 pub const ASK_MAX_PAYLOAD_LEN: u8 = 67;
 
-/// See [`ASK_MAX_PAYLOAD_LEN`](crate::consts::ASK_MAX_PAYLOAD_LEN)
+/// See [`ASK_MAX_PAYLOAD_LEN`]
 pub const ASK_MAX_PAYLOAD_LEN_USIZE: usize = ASK_MAX_PAYLOAD_LEN as usize;
 
 /// Length (in bytes) of the transmitted preamble used to train the receiver PLL.
@@ -62,7 +62,7 @@ pub const ASK_PREAMBLE_LEN: u8 = 8;
 /// This is derived from the maximum payload size minus header and trailer bytes (e.g., CRC).
 pub const ASK_MAX_MESSAGE_LEN: u8 = ASK_MAX_PAYLOAD_LEN - ASK_HEADER_LEN - 3;
 
-/// See [`ASK_MAX_MESSAGE_LEN`](crate::consts::ASK_MAX_MESSAGE_LEN)
+/// See [`ASK_MAX_MESSAGE_LEN`]
 pub const ASK_MAX_MESSAGE_LEN_USIZE: usize = ASK_MAX_MESSAGE_LEN as usize;
 
 /// Maximum size (in bytes) of the full transmission buffer, after encoding and preamble.
@@ -71,7 +71,7 @@ pub const ASK_MAX_MESSAGE_LEN_USIZE: usize = ASK_MAX_MESSAGE_LEN as usize;
 /// Each payload byte becomes two encoded symbols, hence the `* 2`.
 pub const ASK_MAX_BUF_LEN: u8 = (ASK_MAX_PAYLOAD_LEN * 2) + ASK_PREAMBLE_LEN;
 
-/// See [ASK_MAX_BUF_LEN](crate::consts::ASK_MAX_BUF_LEN)
+/// See [ASK_MAX_BUF_LEN]
 pub const ASK_MAX_BUF_LEN_USIZE: usize = ASK_MAX_BUF_LEN as usize;
 
 /// The default address for the RF module.

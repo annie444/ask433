@@ -74,7 +74,7 @@ use std::vec::Vec;
 pub enum AskMode {
     ///   Low-power mode where no RF activity is occurring.
     ///   The driver disables all transmission and reception and may shut down peripherals.
-    ///   Transition to [`Rx`] or [`Tx`] to resume operation.
+    ///   Transition to [`Rx`](AskMode::Rx) or [`Tx`](AskMode::Tx) to resume operation.
     Sleep,
     ///   Ready state. The driver is powered and initialized but not actively sending or receiving.
     ///   This is a good default resting state between operations.
@@ -88,7 +88,7 @@ pub enum AskMode {
     Rx,
     ///   Channel Activity Detection mode. This is a temporary sniffing state used to detect
     ///   whether the channel is currently in use, before transmitting.
-    ///   Typically a short-duration passive RX phase that ends in either [`Idle`] or [`Tx`].
+    ///   Typically a short-duration passive RX phase that ends in either [`Idle`](AskMode::Idle) or [`Tx`](AskMode::Tx).
     Cad,
 }
 
@@ -149,7 +149,7 @@ pub enum AskMode {
 /// - Message encoding (4b6b) and decoding are not yet implemented.
 ///
 /// ## See also
-/// - [`SoftwarePLL`](crate::pll::SoftwarePLL): internal demodulation logic
+/// - [`SoftwarePLL`]: internal demodulation logic
 #[derive(Debug)]
 pub struct AskDriver<TX, RX, PTT>
 where
@@ -165,7 +165,7 @@ where
     pub rx: RX,
     /// Push To Talk (PTT) pin
     pub ptt: Option<PTT>,
-    /// [`SoftwarePLL`](crate::pll::SoftwarePLL) instance
+    /// [`SoftwarePLL`] instance
     pub pll: SoftwarePLL,
     ticks_per_bit: u8,
     tick_counter: u8,
@@ -375,9 +375,9 @@ where
     /// runs validation (via `validate_rx_buf()`) to determine whether the message is valid.
     ///
     /// # Behavior
-    /// - If the driver is currently transmitting (`AskMode::Tx`), returns `false`
-    /// - If the software PLL has filled its buffer (`pll.full == true`), calls
-    ///   [`validate_rx_buf()`] to perform a CRC check and extract headers
+    /// - If the driver is currently transmitting ([`AskMode::Tx`]), returns `false`
+    /// - If the software PLL has filled its buffer (`AskDriver.pll.full == true`), calls
+    ///   [`validate_rx_buf()`](AskDriver::validate_rx_buf) to perform a CRC check and extract headers
     /// - Marks the buffer as no longer full after validation
     /// - Returns the value of `self.rx_buf_valid`, indicating whether a valid message is now present
     ///
@@ -386,7 +386,7 @@ where
     /// - `false`: No valid message is available, or the driver is currently transmitting
     ///
     /// # Notes
-    /// - Calling this function does **not** consume the message; use [`receive()`]
+    /// - Calling this function does **not** consume the message; use [`receive()`](AskDriver::receive)
     ///   to access the payload after this returns `true`.
     /// - This function may trigger a transition from [`AskMode::Idle`] or [`AskMode::Sleep`]
     ///   to [`AskMode::Rx`] if receive mode is not already active.
@@ -559,7 +559,7 @@ where
     /// Must be called precisely and regularly—ideally via timer interrupt or delay loop.
     ///
     /// # See also
-    /// - [`SoftwarePLL`](crate::pll::SoftwarePLL)
+    /// - [`SoftwarePLL`]
     pub fn tick(&mut self) {
         if self.mode == AskMode::Rx {
             // RX always sampled every tick

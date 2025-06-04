@@ -243,8 +243,8 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 ///
 /// # Arguments
 /// - `global_driver`: A reference to a global `Mutex<RefCell<Option<AskDriver>>>`,
-///   typically declared using [`init_global_ask_driver!`] and initialized via [`setup_global_ask_driver!`].
-/// - `vec`: A `heapless::Vec<u8>` containing the payload to send. Must not exceed [`ASK_MAX_MESSAGE_LEN`].
+///   typically declared using [`init_ask_driver!`](crate::init_ask_driver) and initialized via [`setup_ask_driver!`](crate::setup_ask_driver).
+/// - `vec`: A `heapless::Vec<u8>` containing the payload to send. Must not exceed [`ASK_MAX_MESSAGE_LEN`](crate::consts::ASK_MAX_MESSAGE_LEN).
 ///
 /// # Returns
 /// - `true` if the message was successfully queued for transmission

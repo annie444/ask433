@@ -33,12 +33,19 @@
 //! use ask433::driver::AskDriver;
 //! # use embedded_hal_mock::eh1::digital::{Mock as Pin, Transaction as PinTransaction, State as PinState};
 //! # use embedded_hal::digital::OutputPin;
+//! # #[cfg(not(feature = "std"))]
 //! # use critical_section::RawRestoreState;
+//!# #[cfg(not(feature = "std"))]
 //! # use spin::{Mutex, MutexGuard};
+//!# #[cfg(not(feature = "std"))]
 //! # pub static CRIT: Mutex<bool> = Mutex::new(true);
+//!# #[cfg(not(feature = "std"))]
 //! # pub static mut LOCK: Option<MutexGuard<'static, bool>> = None;
+//!# #[cfg(not(feature = "std"))]
 //! # struct MyCriticalSection;
+//!# #[cfg(not(feature = "std"))]
 //! # critical_section::set_impl!(MyCriticalSection);
+//!# #[cfg(not(feature = "std"))]
 //! # unsafe impl critical_section::Impl for MyCriticalSection {
 //! #     unsafe fn acquire() -> RawRestoreState {
 //! #         let val = CRIT.lock();

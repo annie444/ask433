@@ -43,31 +43,7 @@ macro_rules! init_ask_driver {
 /// ```rust
 /// use embedded_hal_mock::eh1::digital::{Mock as Pin, Transaction as Tx, State as St};
 /// use ask433::{init_ask_driver, setup_ask_driver};
-/// # use critical_section::RawRestoreState;
-/// # use spin::{Mutex, MutexGuard};
-/// # pub static CRIT: Mutex<bool> = Mutex::new(true);
-/// # pub static mut LOCK: Option<MutexGuard<'static, bool>> = None;
-/// # struct MyCriticalSection;
-/// # critical_section::set_impl!(MyCriticalSection);
-/// # unsafe impl critical_section::Impl for MyCriticalSection {
-/// #     unsafe fn acquire() -> RawRestoreState {
-/// #         let val = CRIT.lock();
-/// #         unsafe {
-/// #             LOCK = Some(val);
-/// #         }
-/// #         true
-/// #     }
-/// #     unsafe fn release(_token: RawRestoreState) {
-/// #         unsafe {
-/// #             #[allow(static_mut_refs)]
-/// #             let lock = LOCK.take_if(|_| CRIT.is_locked()).unwrap_or_else(|| {
-/// #                 panic!("Critical section was not acquired before release");
-/// #             });
-/// #             LOCK = None;
-/// #             drop(lock);
-/// #         }
-/// #     }
-/// # }
+///
 /// init_ask_driver!(Pin, Pin, Pin);
 /// // ...
 /// # let tx = Pin::new(&[Tx::set(St::Low)]);

@@ -398,7 +398,7 @@ where
     /// # See also
     /// - [`AskDriver::receive()`]
     /// - [`AskDriver::validate_rx_buf()`]
-    pub fn availabile(&mut self) -> bool {
+    pub fn available(&mut self) -> bool {
         if self.mode == AskMode::Tx {
             return false;
         }
@@ -470,7 +470,7 @@ where
     /// Returns a slice of the received message payload, if a valid message is available.
     ///
     /// This method checks whether a complete and validated message is available
-    /// in the internal receive buffer (via [`AskDriver::availabile()`]), and if so,
+    /// in the internal receive buffer (via [`AskDriver::available()`]), and if so,
     /// returns a slice containing just the message payload, excluding the protocol headers
     /// and CRC trailer.
     ///
@@ -497,7 +497,7 @@ where
     /// happen in a valid message.
     #[cfg(not(feature = "std"))]
     pub fn receive(&mut self) -> Option<Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>> {
-        if !self.availabile() {
+        if !self.available() {
             return None;
         }
 
@@ -512,7 +512,7 @@ where
     /// Returns a slice of the received message payload, if a valid message is available.
     ///
     /// This method checks whether a complete and validated message is available
-    /// in the internal receive buffer (via [`AskDriver::availabile()`]), and if so,
+    /// in the internal receive buffer (via [`AskDriver::available()`]), and if so,
     /// returns a slice containing just the message payload, excluding the protocol headers
     /// and CRC trailer.
     ///
@@ -539,7 +539,7 @@ where
     /// happen in a valid message.
     #[cfg(feature = "std")]
     pub fn receive(&mut self) -> Option<Vec<u8>> {
-        if !self.availabile() {
+        if !self.available() {
             return None;
         }
 
@@ -587,9 +587,9 @@ where
         }
     }
 
-    /// Queues a single byte for transmission over the ASK RF link.
+    /// Queues a buffer for transmission over the ASK RF link.
     ///
-    /// This method should encode the byte (e.g. with 4b6b encoding) and load it
+    /// This method encodes the buffer with 4b6b encoding and load it
     /// into an internal transmit buffer for use by `tick()`.
     ///
     /// # Note
@@ -645,9 +645,9 @@ where
         return true;
     }
 
-    /// Queues a single byte for transmission over the ASK RF link.
+    /// Queues a buffer for transmission over the ASK RF link.
     ///
-    /// This method should encode the byte (e.g. with 4b6b encoding) and load it
+    /// This method encodes the buffer with 4b6b encoding and load it
     /// into an internal transmit buffer for use by `tick()`.
     ///
     /// # Note
@@ -866,7 +866,7 @@ mod tests {
         let ptt = PinMock::new(&[PinTransaction::set(PinState::Low)]);
 
         let mut driver = AskDriver::new(tx, rx, Some(ptt), 8, Some(false), Some(false));
-        assert!(!driver.availabile());
+        assert!(!driver.available());
         assert!(driver.receive().is_none());
         driver.tx.done();
         driver.rx.done();

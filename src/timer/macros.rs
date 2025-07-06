@@ -113,7 +113,7 @@ macro_rules! tick_ask_timer {
 /// Attempts to receive a completed message from the global ASK driver instance.
 ///
 /// This macro checks whether a valid and complete message is available using
-/// `driver.availabile()`, and if so, returns a reference to the decoded message
+/// `driver.available()`, and if so, returns a reference to the decoded message
 /// payload slice. If no message is available, or the driver is currently transmitting,
 /// it returns `None`.
 ///
@@ -145,7 +145,7 @@ macro_rules! receive_from_ask {
     () => {
         $crate::critical_section::with(|cs| {
             if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
-                if driver.availabile() {
+                if driver.available() {
                     driver.receive()
                 } else {
                     None

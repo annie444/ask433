@@ -118,7 +118,7 @@ pub fn global_ask_timer_tick<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// Attempts to receive a message from a global `AskDriver` instance wrapped in a `Mutex`.
 ///
 /// This function checks whether a valid and complete message is available using the
-/// driver's `availabile()` method. If a message is present, it returns a heapless `Vec`
+/// driver's `available()` method. If a message is present, it returns a heapless `Vec`
 /// containing the decoded payload. If the buffer is invalid or incomplete, `None` is returned.
 ///
 /// # Type Parameters
@@ -155,7 +155,7 @@ pub fn global_ask_timer_tick<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// ```
 ///
 /// # See also
-/// - [`AskDriver::availabile()`]
+/// - [`AskDriver::available()`]
 /// - [`AskDriver::receive()`]
 #[cfg(not(feature = "std"))]
 pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
@@ -164,7 +164,7 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
     critical_section::with(|cs| {
         let mut guard = global_driver.borrow(cs).borrow_mut();
         let driver = guard.as_mut()?;
-        if driver.availabile() {
+        if driver.available() {
             driver.receive()
         } else {
             None
@@ -175,7 +175,7 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// Attempts to receive a message from a global `AskDriver` instance wrapped in a `Mutex`.
 ///
 /// This function checks whether a valid and complete message is available using the
-/// driver's `availabile()` method. If a message is present, it returns a heapless `Vec`
+/// driver's `available()` method. If a message is present, it returns a heapless `Vec`
 /// containing the decoded payload. If the buffer is invalid or incomplete, `None` is returned.
 ///
 /// # Type Parameters
@@ -212,7 +212,7 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// ```
 ///
 /// # See also
-/// - [`AskDriver::availabile()`]
+/// - [`AskDriver::available()`]
 /// - [`AskDriver::receive()`]
 #[cfg(feature = "std")]
 pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
@@ -221,7 +221,7 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
     critical_section::with(|cs| {
         let mut guard = global_driver.borrow(cs).borrow_mut();
         let driver = guard.as_mut()?;
-        if driver.availabile() {
+        if driver.available() {
             driver.receive()
         } else {
             None

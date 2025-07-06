@@ -124,6 +124,7 @@ pub(crate) mod crc;
 pub mod driver;
 pub mod encoding;
 pub mod pll;
+pub mod radio_head;
 pub mod timer;
 
 #[cfg(test)]
@@ -282,7 +283,7 @@ mod tests {
                 std::thread::sleep(std::time::Duration::from_micros(63));
             }
 
-            let _ = driver.availabile();
+            let _ = driver.available();
 
             // Check if the driver received the message correctly
             let received = driver.receive();

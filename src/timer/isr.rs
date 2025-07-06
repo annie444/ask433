@@ -55,17 +55,15 @@ pub const fn global_ask_driver_init<TX: OutputPin, RX: InputPin, PTT: OutputPin>
 /// static ASK_DRIVER: Mutex<RefCell<Option<AskDriver<Pin, Pin, Pin>>>> =
 ///     global_ask_driver_init::<Pin, Pin, Pin>();
 ///
-/// fn main() {
-///     # let tx = Pin::new(&[PinTransaction::set(PinState::Low)]);
-///     # let rx = Pin::new(&[]);
-///     global_ask_driver_setup::<Pin, Pin, Pin>(&ASK_DRIVER, tx, rx, None, 8, None, None);
-///     # critical_section::with(|cs| {
-///     #    if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
-///     #       driver.tx.done();
-///     #       driver.rx.done();
-///     #   }
-///     # });
-/// }
+/// # let tx = Pin::new(&[PinTransaction::set(PinState::Low)]);
+/// # let rx = Pin::new(&[]);
+/// global_ask_driver_setup::<Pin, Pin, Pin>(&ASK_DRIVER, tx, rx, None, 8, None, None);
+/// # critical_section::with(|cs| {
+/// #    if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
+/// #       driver.tx.done();
+/// #       driver.rx.done();
+/// #   }
+/// # });
 /// ```
 pub fn global_ask_driver_setup<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
     global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,

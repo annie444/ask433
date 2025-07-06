@@ -22,18 +22,16 @@
 //! # use embedded_hal::digital::OutputPin;
 //! use ask433::driver::AskDriver;
 //!
-//! fn main() {
-//!     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
-//!     # let rx_pin = Pin::new(&[]);
-//!     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
+//! # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
+//! # let rx_pin = Pin::new(&[]);
+//! let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
 //!
-//!     loop {
-//!         driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
-//!         # break; // For testing purposes
-//!     }
-//!     # driver.tx.done();
-//!     # driver.rx.done();
+//! loop {
+//!     driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
+//!     # break; // For testing purposes
 //! }
+//! # driver.tx.done();
+//! # driver.rx.done();
 //! ```
 //!
 //! ## Design Notes
@@ -127,18 +125,16 @@ pub enum AskMode {
 /// # use embedded_hal::digital::OutputPin;
 /// use ask433::driver::AskDriver;
 ///
-/// fn main() {
-///     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
-///     # let rx_pin = Pin::new(&[]);
-///     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
+/// # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
+/// # let rx_pin = Pin::new(&[]);
+/// let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
 ///
-///     loop {
-///         driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
-///         # break; // For testing purposes
-///     }
-///     # driver.tx.done();
-///     # driver.rx.done();
+/// loop {
+///     driver.tick(); // Called every 62.5 µs by a delay or timer interrupt
+///     # break; // For testing purposes
 /// }
+/// # driver.tx.done();
+/// # driver.rx.done();
 /// ```
 ///
 /// ## Notes

@@ -33,19 +33,17 @@
 //! use ask433::driver::AskDriver;
 //! # use embedded_hal_mock::eh1::digital::{Mock as Pin, Transaction as PinTransaction, State as PinState};
 //! # use embedded_hal::digital::OutputPin;
-//! fn main() {
-//!     // ...
-//!     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
-//!     # let rx_pin = Pin::new(&[]);
-//!     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
-//!                                                        // ^ this is the number of interrupts per bit
-//!     loop {
-//!         driver.tick(); // Call at ~62.5 µs intervals
-//!         # break; // For testing purposes
-//!     }
-//!     # driver.tx.done(); // Mark the transmission complete
-//!     # driver.rx.done(); // Mark the reception complete
+//! // ...
+//! # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
+//! # let rx_pin = Pin::new(&[]);
+//! let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
+//!                                                    // ^ this is the number of interrupts per bit
+//! loop {
+//!     driver.tick(); // Call at ~62.5 µs intervals
+//!     # break; // For testing purposes
 //! }
+//! # driver.tx.done(); // Mark the transmission complete
+//! # driver.rx.done(); // Mark the reception complete
 //! ```
 //!
 //! Or, use `run_tick_loop()` with a `DelayUs` implementation:
@@ -58,18 +56,16 @@
 //! # use embedded_hal_mock::eh1::delay::NoopDelay as Delay;
 //! # use embedded_hal::digital::OutputPin;
 //!
-//! fn main() {
-//!     // ...
-//!     # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
-//!     # let rx_pin = Pin::new(&[]);
-//!     let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
+//! // ...
+//! # let tx_pin = Pin::new(&[PinTransaction::set(PinState::Low)]);
+//! # let rx_pin = Pin::new(&[]);
+//! let mut driver: AskDriver<Pin, Pin, Pin> = AskDriver::new(tx_pin, rx_pin, None, 8, None, None);
 //! # #[cfg(feature = "delay-loop")]                                                      // ^ this is the number of interrupts per bit
-//!     # let mut delay = Delay::new();
+//! # let mut delay = Delay::new();
 //! # #[cfg(feature = "delay-loop")]
-//!     run_ask_tick_loop(&mut driver, &mut delay, 63);
-//!     # driver.tx.done();
-//!     # driver.rx.done();
-//! }
+//! run_ask_tick_loop(&mut driver, &mut delay, 63);
+//! # driver.tx.done();
+//! # driver.rx.done();
 //! ```
 //!
 //! ## Feature Flags
@@ -128,6 +124,39 @@ pub mod timer;
 
 #[cfg(test)]
 mod tests {
+
+    #[cfg(all(test, not(feature = "std")))]
+    mod lib {
+        use critical_section::RawRestoreState;
+        use spin::{Mutex, MutexGuard};
+
+        pub static CRIT: Mutex<bool> = Mutex::new(true);
+        pub static mut LOCK: Option<MutexGuard<'static, bool>> = None;
+
+        struct MyCriticalSection;
+        critical_section::set_impl!(MyCriticalSection);
+
+        unsafe impl critical_section::Impl for MyCriticalSection {
+            unsafe fn acquire() -> RawRestoreState {
+                let val = CRIT.lock();
+                unsafe {
+                    LOCK = Some(val);
+                }
+                true
+            }
+
+            unsafe fn release(_token: RawRestoreState) {
+                unsafe {
+                    #[allow(static_mut_refs)]
+                    let lock = LOCK.take_if(|_| CRIT.is_locked()).unwrap_or_else(|| {
+                        panic!("Critical section was not acquired before release");
+                    });
+                    LOCK = None;
+                    drop(lock);
+                }
+            }
+        }
+    }
 
     #[cfg(all(test, feature = "std"))]
     mod lib {

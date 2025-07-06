@@ -33,3 +33,4 @@ nb = "1.1.0"
 [dev-dependencies]
 embedded-hal-mock = { version = "0.11.1", features = ["eh1"] }
 critical-section = { version = "1.2.0", features = ["restore-state-bool"] }
+spin = { version = "0.10.0", features = ["mutex"] }

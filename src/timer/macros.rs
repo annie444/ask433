@@ -45,18 +45,16 @@ macro_rules! init_ask_driver {
 /// use ask433::{init_ask_driver, setup_ask_driver};
 ///
 /// init_ask_driver!(Pin, Pin, Pin);
-///
-/// fn main() {
-///     # let tx = Pin::new(&[Tx::set(St::Low)]);
-///     # let rx = Pin::new(&[]);
-///     setup_ask_driver!(tx, rx, None, 8, None, None);
-///     # critical_section::with(|cs| {
-///     #    if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
-///     #       driver.tx.done();
-///     #       driver.rx.done();
-///     #   }
-///     # });
-/// }
+/// // ...
+/// # let tx = Pin::new(&[Tx::set(St::Low)]);
+/// # let rx = Pin::new(&[]);
+/// setup_ask_driver!(tx, rx, None, 8, None, None);
+/// # critical_section::with(|cs| {
+/// #    if let Some(driver) = ASK_DRIVER.borrow(cs).borrow_mut().as_mut() {
+/// #       driver.tx.done();
+/// #       driver.rx.done();
+/// #   }
+/// # });
 /// ```
 ///
 /// # Notes
@@ -133,11 +131,9 @@ macro_rules! tick_ask_timer {
 ///
 /// init_ask_driver!(Pin, Pin, Pin);
 ///
-/// fn main() {
-///     // ...
-///     if let Some(msg) = receive_from_ask!() {
-///         // Process message payload
-///     }
+/// // ...
+/// if let Some(msg) = receive_from_ask!() {
+///     // Process message payload
 /// }
 /// ```
 #[cfg_attr(feature = "timer-isr", macro_export)]
@@ -179,14 +175,11 @@ macro_rules! receive_from_ask {
 ///
 /// init_ask_driver!(Pin, Pin, Pin);
 ///
-/// fn main() {
+/// // ...
 ///
-///     // ...
-///
-///     let sent1 = send_from_ask!(0xAB; 4);         // send [0xAB, 0xAB, 0xAB, 0xAB]
-///     let sent2 = send_from_ask!(1, 2, 3, 4, 5);   // send [1, 2, 3, 4, 5]
-///     let sent3 = send_from_ask!("Hello, World!");  // send [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21]
-/// }
+/// let sent1 = send_from_ask!(0xAB; 4);         // send [0xAB, 0xAB, 0xAB, 0xAB]
+/// let sent2 = send_from_ask!(1, 2, 3, 4, 5);   // send [1, 2, 3, 4, 5]
+/// let sent3 = send_from_ask!("Hello, World!");  // send [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21]
 /// ```
 #[cfg(not(feature = "std"))]
 #[cfg_attr(all(feature = "timer-isr", not(feature = "std")), macro_export)]
@@ -249,15 +242,12 @@ macro_rules! send_from_ask {
 ///
 /// init_ask_driver!(Pin, Pin, Pin);
 ///
-/// fn main() {
 ///
-///     // ...
+/// // ...
 ///
-///     let sent1: bool = send_from_ask![0xAB; 4];         // send [0xAB, 0xAB, 0xAB, 0xAB]
-///     let sent2: bool = send_from_ask![1, 2, 3, 4, 5];   // send [1, 2, 3, 4, 5]
-///     let sent3: bool = send_from_ask!("Hello, World!");  // send [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21]
-///
-/// }
+/// let sent1: bool = send_from_ask![0xAB; 4];         // send [0xAB, 0xAB, 0xAB, 0xAB]
+/// let sent2: bool = send_from_ask![1, 2, 3, 4, 5];   // send [1, 2, 3, 4, 5]
+/// let sent3: bool = send_from_ask!("Hello, World!");  // send [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21]
 /// ```
 #[cfg(feature = "std")]
 #[cfg_attr(all(feature = "timer-isr", feature = "std"), macro_export)]

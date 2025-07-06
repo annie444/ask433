@@ -1,0 +1,43 @@
+name: "Audit Dependencies"
+
+on:
+  push:
+    paths:
+      # Run if workflow changes
+      - ".github/workflows/audit.yml"
+      # Run on changed dependencies
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      # Run if the configuration file changes
+      - "**/audit.toml"
+  pull_request:
+  # Rerun periodically to pick up new advisories
+  schedule:
+    - cron: "0 0 * * *"
+  # Run manually
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache-key: ${{ runner.os }}-stable
+
+      - uses: actions-rust-lang/audit@v1
+        name: Audit Rust Dependencies

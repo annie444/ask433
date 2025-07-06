@@ -1,0 +1,117 @@
+name: Test, Format, and Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+        features:
+          - "delay-loop,timer-isr"
+          - "std,delay-loop,timer-isr"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          cache-key: ${{ runner.os }}-${{ matrix.toolchain }}
+
+      - name: Build
+        run: cargo build --verbose --no-default-features --features ${{ matrix.features }}
+
+      - name: Test
+        run: cargo test --verbose  --no-default-features --features ${{ matrix.features }}
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
+        features:
+          - "delay-loop,timer-isr"
+          - "std,delay-loop,timer-isr"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: clippy,rustfmt
+          cache-key: ${{ runner.os }}-${{ matrix.toolchain }}
+
+      - name: Run cargo checks
+        run: cargo check --verbose --no-default-features --features ${{ matrix.features }}
+
+      - name: Run clippy
+        run: cargo clippy --verbose --no-default-features --features ${{ matrix.features }} -- -D warnings
+
+      - name: Run rustfmt
+        uses: actions-rust-lang/rustfmt@v1
+
+      - name: Run cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v2
+
+  doc:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: rm -f .cargo/config.toml && rm -f rust-toolchain.toml
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+          cache-key: ${{ runner.os }}-stable
+
+      - name: Build docs with all features
+        run: cargo doc --features timer-isr,delay-loop -vv

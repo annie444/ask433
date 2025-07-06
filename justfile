@@ -24,6 +24,14 @@ reset := '\033[0m'
 default:
   @just --list
 
+check:
+  cargo clippy --no-default-features --features delay-loop,timer-isr -- -D warnings
+  cargo clippy --no-default-features --features std,delay-loop,timer-isr -- -D warnings
+
+test:
+  cargo test --no-default-features --features delay-loop,timer-isr
+  cargo test --no-default-features --features std,delay-loop,timer-isr
+
 build-all:
   #!/usr/bin/env bash
   set -euo pipefail

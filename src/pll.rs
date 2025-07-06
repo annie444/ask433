@@ -173,14 +173,12 @@ impl SoftwarePLL {
         }
 
         if self.ramp >= self.ramp_len {
-            if self.integrate() {
-                return;
-            }
+            self.integrate()
         }
     }
 
     /// Integrates the current state of the PLL.
-    fn integrate(&mut self) -> bool {
+    fn integrate(&mut self) {
         // Add this to the 12th bit of _rxBits, LSB first
         // The last 12 bits are kept
         self.bits >>= 1;
@@ -195,17 +193,16 @@ impl SoftwarePLL {
         self.integrator = 0;
 
         if self.active {
-            return self.add_byte();
+            self.add_byte()
         } else if self.bits == ASK_START_SYMBOL {
             self.active = true;
             self.bit_count = 0;
             self.buf_len = 0;
         }
-        false
     }
 
     /// Adds a byte to the buffer if enough bits have been collected.
-    fn add_byte(&mut self) -> bool {
+    fn add_byte(&mut self) {
         // We have the start symbol and now we are collecting message bits,
         // 6 per symbol, each which has to be decoded to 4 bits
         self.bit_count += 1;
@@ -226,7 +223,7 @@ impl SoftwarePLL {
                     // Stupid message length, drop the whole thing
                     self.active = false;
                     self.bad += 1;
-                    return true;
+                    return;
                 }
             }
             #[cfg(not(feature = "std"))]
@@ -242,7 +239,6 @@ impl SoftwarePLL {
             }
             self.bit_count = 0;
         }
-        false
     }
 }
 

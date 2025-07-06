@@ -113,7 +113,7 @@ pub fn encode_buffer(input: &[u8]) -> Vec<u8, ASK_MAX_BUF_LEN_USIZE> {
 /// pairs.)
 #[cfg(feature = "std")]
 pub fn decode_buffer(input: &[u8]) -> Vec<u8> {
-    if input.len() % 2 != 0 {
+    if !input.len().is_multiple_of(2) {
         return Vec::new(); // Invalid input length
     }
     let mut output: Vec<u8> = Vec::with_capacity(input.len() / 2);

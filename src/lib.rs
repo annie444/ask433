@@ -191,7 +191,7 @@ mod tests {
         }
     }
 
-    #[cfg(all(test))]
+    #[cfg(test)]
     #[cfg(feature = "std")]
     mod lib {
         use crate::driver::AskDriver;

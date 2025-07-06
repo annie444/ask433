@@ -173,63 +173,76 @@ impl SoftwarePLL {
         }
 
         if self.ramp >= self.ramp_len {
-            // Add this to the 12th bit of _rxBits, LSB first
-            // The last 12 bits are kept
-            self.bits >>= 1;
-
-            // Check the integrator to see how many samples in this cycle were high.
-            // If < 5 out of 8, then its declared a 0 bit, else a 1;
-            if self.integrator >= 5 {
-                self.bits |= 0x800;
-            }
-
-            self.ramp -= self.ramp_len;
-            self.integrator = 0;
-
-            if self.active {
-                // We have the start symbol and now we are collecting message bits,
-                // 6 per symbol, each which has to be decoded to 4 bits
-                self.bit_count += 1;
-                if self.bit_count >= 12 {
-                    // Have 12 bits of encoded message == 1 byte encoded
-                    // Decode as 2 lots of 6 bits into 2 lots of 4 bits
-                    // The 6 lsbits are the high nybble
-                    let this_byte =
-                        decode_6b4b(&((self.bits & 0x3f) as u8), &((self.bits >> 6) as u8));
-                    // The first decoded byte is the byte count of the following message
-                    // the count includes the byte count and the 2 trailing FCS bytes
-                    // REVISIT: may also include the ACK flag at 0x40
-                    if self.buf_len == 0 {
-                        // The first byte is the byte count
-                        // Check it for sensibility. It cant be less than 7, since it
-                        // includes the byte count itself, the 4 byte header and the 2 byte FCS
-                        self.count = this_byte;
-                        if self.count < 7 || self.count > ASK_MAX_PAYLOAD_LEN {
-                            // Stupid message length, drop the whole thing
-                            self.active = false;
-                            self.bad += 1;
-                            return;
-                        }
-                    }
-                    #[cfg(not(feature = "std"))]
-                    let _ = self.buf.push(this_byte);
-                    #[cfg(feature = "std")]
-                    self.buf.push(this_byte);
-                    self.buf_len += 1;
-
-                    if self.buf_len >= self.count {
-                        // Got all the bytes now
-                        self.active = false;
-                        self.full = true;
-                    }
-                    self.bit_count = 0;
-                }
-            } else if self.bits == ASK_START_SYMBOL {
-                self.active = true;
-                self.bit_count = 0;
-                self.buf_len = 0;
+            if self.integrate() {
+                return;
             }
         }
+    }
+
+    /// Integrates the current state of the PLL.
+    fn integrate(&mut self) -> bool {
+        // Add this to the 12th bit of _rxBits, LSB first
+        // The last 12 bits are kept
+        self.bits >>= 1;
+
+        // Check the integrator to see how many samples in this cycle were high.
+        // If < 5 out of 8, then its declared a 0 bit, else a 1;
+        if self.integrator >= 5 {
+            self.bits |= 0x800;
+        }
+
+        self.ramp -= self.ramp_len;
+        self.integrator = 0;
+
+        if self.active {
+            return self.add_byte();
+        } else if self.bits == ASK_START_SYMBOL {
+            self.active = true;
+            self.bit_count = 0;
+            self.buf_len = 0;
+        }
+        false
+    }
+
+    /// Adds a byte to the buffer if enough bits have been collected.
+    fn add_byte(&mut self) -> bool {
+        // We have the start symbol and now we are collecting message bits,
+        // 6 per symbol, each which has to be decoded to 4 bits
+        self.bit_count += 1;
+        if self.bit_count >= 12 {
+            // Have 12 bits of encoded message == 1 byte encoded
+            // Decode as 2 lots of 6 bits into 2 lots of 4 bits
+            // The 6 lsbits are the high nybble
+            let this_byte = decode_6b4b(&((self.bits & 0x3f) as u8), &((self.bits >> 6) as u8));
+            // The first decoded byte is the byte count of the following message
+            // the count includes the byte count and the 2 trailing FCS bytes
+            // REVISIT: may also include the ACK flag at 0x40
+            if self.buf_len == 0 {
+                // The first byte is the byte count
+                // Check it for sensibility. It cant be less than 7, since it
+                // includes the byte count itself, the 4 byte header and the 2 byte FCS
+                self.count = this_byte;
+                if self.count < 7 || self.count > ASK_MAX_PAYLOAD_LEN {
+                    // Stupid message length, drop the whole thing
+                    self.active = false;
+                    self.bad += 1;
+                    return true;
+                }
+            }
+            #[cfg(not(feature = "std"))]
+            let _ = self.buf.push(this_byte);
+            #[cfg(feature = "std")]
+            self.buf.push(this_byte);
+            self.buf_len += 1;
+
+            if self.buf_len >= self.count {
+                // Got all the bytes now
+                self.active = false;
+                self.full = true;
+            }
+            self.bit_count = 0;
+        }
+        false
     }
 }
 

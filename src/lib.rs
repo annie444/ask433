@@ -196,16 +196,25 @@ mod tests {
     mod lib {
         use crate::driver::AskDriver;
         use core::fmt;
+        #[rustversion::not(stable)]
+        #[cfg(all(feature = "std", target_os = "linux"))]
         use critical_section::RawRestoreState;
         use embedded_hal::digital;
         use std::collections::VecDeque;
         use std::sync::{Arc, Mutex};
 
+        #[rustversion::not(stable)]
+        #[cfg(all(feature = "std", target_os = "linux"))]
         pub static CRIT: Mutex<bool> = Mutex::new(true);
 
+        #[rustversion::not(stable)]
+        #[cfg(all(feature = "std", target_os = "linux"))]
         struct MyCriticalSection;
+        #[rustversion::not(stable)]
+        #[cfg(all(feature = "std", target_os = "linux"))]
         critical_section::set_impl!(MyCriticalSection);
-
+        #[rustversion::not(stable)]
+        #[cfg(all(feature = "std", target_os = "linux"))]
         unsafe impl critical_section::Impl for MyCriticalSection {
             unsafe fn acquire() -> RawRestoreState {
                 let val = CRIT.lock().unwrap();

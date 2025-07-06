@@ -157,7 +157,8 @@ pub mod timer;
 #[cfg(test)]
 mod tests {
 
-    #[cfg(all(test, not(feature = "std")))]
+    #[cfg(test)]
+    #[cfg(not(feature = "std"))]
     mod lib {
         use critical_section::RawRestoreState;
         use spin::{Mutex, MutexGuard};
@@ -190,7 +191,8 @@ mod tests {
         }
     }
 
-    #[cfg(all(test, feature = "std"))]
+    #[cfg(all(test))]
+    #[cfg(feature = "std")]
     mod lib {
         use crate::driver::AskDriver;
         use core::fmt;

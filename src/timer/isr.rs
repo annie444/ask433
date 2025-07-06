@@ -44,7 +44,7 @@ pub const fn global_ask_driver_init<TX: OutputPin, RX: InputPin, PTT: OutputPin>
 ///   e.g. For the Atmega328P with an interrupt frequency of `~62.5µs`:
 ///   ```rust
 ///   // 8 ticks / bit = 1 second / 2000 bits * 1 tick / 6.25e-5 seconds
-///   const TICKS_PER_BIT: u8 = (1/2000)*(1/625e-7_f32) as u8
+///   const TICKS_PER_BIT: u8 = (((1 / 2000) as u16) * ((1.0 / 625e-7_f32) as u16)) as u8;
 ///   ```
 ///# Example
 /// ```rust

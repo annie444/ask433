@@ -135,7 +135,7 @@ pub fn decode_buffer(input: &[u8]) -> Vec<u8> {
 /// pairs.)
 #[cfg(not(feature = "std"))]
 pub fn decode_buffer(input: &[u8]) -> Vec<u8, ASK_MAX_PAYLOAD_LEN_USIZE> {
-    if input.len() % 2 != 0 {
+    if !input.len().is_multiple_of(2) {
         return Vec::new(); // Invalid input length
     }
     let mut output = Vec::new();

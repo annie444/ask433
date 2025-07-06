@@ -263,19 +263,16 @@ where
         ptt_inverted: Option<bool>,
         rx_inverted: Option<bool>,
     ) -> Self {
-        let ptt_invert = match ptt_inverted {
-            Some(ptt) => ptt,
-            None => false,
-        };
+        let ptt_invert = ptt_inverted.unwrap_or_default();
         #[allow(unused_mut)]
         let mut tx = tx;
         let _ = tx.set_low(); // Ensure idle
         let mut tx_buf = Vec::new();
+        #[cfg(not(feature = "std"))]
         let _ = tx_buf.extend_from_slice(&Self::PREAMBLE);
-        let rx_invert = match rx_inverted {
-            Some(rxi) => rxi,
-            None => false,
-        };
+        #[cfg(feature = "std")]
+        tx_buf.extend_from_slice(&Self::PREAMBLE);
+        let rx_invert = rx_inverted.unwrap_or_default();
         let mut cls = Self {
             mode: AskMode::Idle,
             tx,
@@ -403,7 +400,7 @@ where
             self.validate_rx_buf();
             self.pll.full = false;
         }
-        return self.rx_buf_valid;
+        self.rx_buf_valid
     }
 
     /// Validates the received message buffer using CRC-CCITT and extracts header metadata.
@@ -604,33 +601,33 @@ where
 
         // Encode the message length
         crc = crc_ccitt_update(crc, &count);
-        let _ = self.tx_buf.extend(encode_4b6b(count));
+        self.tx_buf.extend(encode_4b6b(count));
 
         // Encode the headers
         crc = crc_ccitt_update(crc, &self.tx_header_to);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_to));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_to));
         crc = crc_ccitt_update(crc, &self.tx_header_from);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_from));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_from));
         crc = crc_ccitt_update(crc, &self.tx_header_id);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_id));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_id));
         crc = crc_ccitt_update(crc, &self.tx_header_flags);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_flags));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_flags));
 
         // Encode the message into 6 bit symbols. Each byte is converted into
         // 2 6-bit symbols, high nybble first, low nybble second
         for b in bytes {
             crc = crc_ccitt_update(crc, &b);
-            let _ = self.tx_buf.extend(encode_4b6b(b));
+            self.tx_buf.extend(encode_4b6b(b));
         }
 
         // Append the fcs, 16 bits before encoding (4 6-bit symbols after encoding)
         // Caution: VW expects the _ones_complement_ of the CCITT CRC-16 as the FCS
         // VW sends FCS as low byte then hi byte
         crc = !crc;
-        let _ = self.tx_buf.push(SYMBOLS[((crc >> 4) & 0xf) as usize]);
-        let _ = self.tx_buf.push(SYMBOLS[(crc & 0xf) as usize]);
-        let _ = self.tx_buf.push(SYMBOLS[((crc >> 12) & 0xf) as usize]);
-        let _ = self.tx_buf.push(SYMBOLS[((crc >> 8) & 0xf) as usize]);
+        self.tx_buf.push(SYMBOLS[((crc >> 4) & 0xf) as usize]);
+        self.tx_buf.push(SYMBOLS[(crc & 0xf) as usize]);
+        self.tx_buf.push(SYMBOLS[((crc >> 12) & 0xf) as usize]);
+        self.tx_buf.push(SYMBOLS[((crc >> 8) & 0xf) as usize]);
 
         // Total number of 6-bit symbols to send
         self.tx_buf_len = self.tx_buf.len() as u8;
@@ -638,7 +635,7 @@ where
         // Start the low level interrupt handler sending symbols
         self.set_mode_tx();
 
-        return true;
+        true
     }
 
     /// Queues a single byte for transmission over the ASK RF link.
@@ -662,33 +659,53 @@ where
 
         // Encode the message length
         crc = crc_ccitt_update(crc, &count);
-        let _ = self.tx_buf.extend(encode_4b6b(count));
+        self.tx_buf.extend(encode_4b6b(count));
 
         // Encode the headers
         crc = crc_ccitt_update(crc, &self.tx_header_to);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_to));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_to));
         crc = crc_ccitt_update(crc, &self.tx_header_from);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_from));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_from));
         crc = crc_ccitt_update(crc, &self.tx_header_id);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_id));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_id));
         crc = crc_ccitt_update(crc, &self.tx_header_flags);
-        let _ = self.tx_buf.extend(encode_4b6b(self.tx_header_flags));
+        self.tx_buf.extend(encode_4b6b(self.tx_header_flags));
 
         // Encode the message into 6 bit symbols. Each byte is converted into
         // 2 6-bit symbols, high nybble first, low nybble second
         for b in bytes {
             crc = crc_ccitt_update(crc, &b);
-            let _ = self.tx_buf.extend(encode_4b6b(b));
+            self.tx_buf.extend(encode_4b6b(b));
         }
 
         // Append the fcs, 16 bits before encoding (4 6-bit symbols after encoding)
         // Caution: VW expects the _ones_complement_ of the CCITT CRC-16 as the FCS
         // VW sends FCS as low byte then hi byte
         crc = !crc;
-        let _ = self.tx_buf.push(SYMBOLS[((crc >> 4) & 0xf) as usize]);
-        let _ = self.tx_buf.push(SYMBOLS[(crc & 0xf) as usize]);
-        let _ = self.tx_buf.push(SYMBOLS[((crc >> 12) & 0xf) as usize]);
-        let _ = self.tx_buf.push(SYMBOLS[((crc >> 8) & 0xf) as usize]);
+        if self
+            .tx_buf
+            .push(SYMBOLS[((crc >> 4) & 0xf) as usize])
+            .is_err()
+        {
+            return false;
+        }
+        if self.tx_buf.push(SYMBOLS[(crc & 0xf) as usize]).is_err() {
+            return false;
+        }
+        if self
+            .tx_buf
+            .push(SYMBOLS[((crc >> 12) & 0xf) as usize])
+            .is_err()
+        {
+            return false;
+        }
+        if self
+            .tx_buf
+            .push(SYMBOLS[((crc >> 8) & 0xf) as usize])
+            .is_err()
+        {
+            return false;
+        }
 
         // Total number of 6-bit symbols to send
         self.tx_buf_len = self.tx_buf.len() as u8;
@@ -696,7 +713,7 @@ where
         // Start the low level interrupt handler sending symbols
         self.set_mode_tx();
 
-        return true;
+        true
     }
 
     /// Advances to the next encoded bit in the transmission sequence.

@@ -8,7 +8,7 @@
 /// - `$tx`: The concrete type of the TX pin (must implement `OutputPin`)
 /// - `$rx`: The concrete type of the RX pin (must implement `InputPin`)
 /// - `$ptt`: The concrete type of the PRR pin (must implement `OutputPin`). **NOTE**: While you
-/// might not have a PTT pin, it is imperative that you pass a type here.
+///   might not have a PTT pin, it is imperative that you pass a type here.
 ///
 /// # Example
 /// ```rust

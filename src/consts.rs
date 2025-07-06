@@ -17,8 +17,6 @@
 //! These values should be used wherever framing or buffer logic is implemented to ensure
 //! consistent message boundaries and timing alignment.
 
-use core::u8;
-
 /// Bitmask for protocol-level flags reserved for future use.
 ///
 /// These upper 4 bits of the flags byte are reserved by the protocol

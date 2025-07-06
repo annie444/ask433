@@ -9,7 +9,7 @@
 //! - `const_ocr_value`: compile-time OCR calculator
 //! - `run_ask_tick_loop`: blocking driver loop for DelayUs (feature `delay-loop`)
 //! - `global_ask_timer_tick` and `tick_ask_timer!()`: interrupt-based tick callback wrapper
-//! (feature `timer-isr`)
+//!   (feature `timer-isr`)
 //!
 //! Common prescalers: (For use with `compute_ocr_value` and `const_ocr_value`)
 //!

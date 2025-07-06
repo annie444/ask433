@@ -7,6 +7,9 @@ use embedded_hal::digital::{InputPin, OutputPin};
 #[cfg(not(feature = "std"))]
 use heapless::Vec;
 
+/// A type alias for a global `Mutex` that wraps an `AskDriver` instance.
+pub type AskDriverMutex<TX, RX, PTT> = Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>;
+
 /// Used to initialize the global static `AskDriver` for use with
 /// `critical_section`.
 ///
@@ -20,13 +23,13 @@ use heapless::Vec;
 /// use critical_section::Mutex;
 /// use embedded_hal::digital::{InputPin, OutputPin};
 /// # use embedded_hal_mock::eh1::digital::{Mock as Pin, State as PinState, Transaction as PinTransaction};
-/// use ask433::timer::global_ask_driver_init;
+/// use ask433::timer::{global_ask_driver_init, AskDriverMutex};
 ///
-/// static ASK_DRIVER: Mutex<RefCell<Option<AskDriver<Pin, Pin, Pin>>>> =
+/// static ASK_DRIVER: AskDriverMutex<Pin, Pin, Pin> =
 ///     global_ask_driver_init::<Pin, Pin, Pin>();
 /// ```
 pub const fn global_ask_driver_init<TX: OutputPin, RX: InputPin, PTT: OutputPin>()
--> Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>> {
+-> AskDriverMutex<TX, RX, PTT> {
     Mutex::new(RefCell::new(None))
 }
 
@@ -37,12 +40,12 @@ pub const fn global_ask_driver_init<TX: OutputPin, RX: InputPin, PTT: OutputPin>
 /// * The tx pin
 /// * The rx pin
 /// * The number of ticks per bit such that:
-///     `interrupt frequency / ticks per bit = 2000 bits per second`
-///     e.g. For the Atmega328P with an interrupt frequency of `~62.5µs`:
-///         ```rust
-///         // 8 ticks / bit = 1 second / 2000 bits * 1 tick / 6.25e-5 seconds
-///         const TICKS_PER_BIT: u8 = (1/2000)*(1/625e-7_f32) as u8
-///         ```
+///   `interrupt frequency / ticks per bit = 2000 bits per second`
+///   e.g. For the Atmega328P with an interrupt frequency of `~62.5µs`:
+///   ```rust
+///   // 8 ticks / bit = 1 second / 2000 bits * 1 tick / 6.25e-5 seconds
+///   const TICKS_PER_BIT: u8 = (1/2000)*(1/625e-7_f32) as u8
+///   ```
 ///# Example
 /// ```rust
 /// use ask433::driver::AskDriver;
@@ -50,9 +53,9 @@ pub const fn global_ask_driver_init<TX: OutputPin, RX: InputPin, PTT: OutputPin>
 /// use critical_section::Mutex;
 /// use embedded_hal::digital::{InputPin, OutputPin};
 /// # use embedded_hal_mock::eh1::digital::{Mock as Pin, State as PinState, Transaction as PinTransaction};
-/// use ask433::timer::{global_ask_driver_init, global_ask_driver_setup};
+/// use ask433::timer::{global_ask_driver_init, global_ask_driver_setup, AskDriverMutex};
 ///
-/// static ASK_DRIVER: Mutex<RefCell<Option<AskDriver<Pin, Pin, Pin>>>> =
+/// static ASK_DRIVER: AskDriverMutex<Pin, Pin, Pin> =
 ///     global_ask_driver_init::<Pin, Pin, Pin>();
 ///
 /// # let tx = Pin::new(&[PinTransaction::set(PinState::Low)]);
@@ -66,7 +69,7 @@ pub const fn global_ask_driver_init<TX: OutputPin, RX: InputPin, PTT: OutputPin>
 /// # });
 /// ```
 pub fn global_ask_driver_setup<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
-    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    global_driver: &'static AskDriverMutex<TX, RX, PTT>,
     tx: TX,
     rx: RX,
     ptt: Option<PTT>,
@@ -104,7 +107,7 @@ pub fn global_ask_driver_setup<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// }
 /// ```
 pub fn global_ask_timer_tick<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
-    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    global_driver: &'static AskDriverMutex<TX, RX, PTT>,
 ) {
     critical_section::with(|cs| {
         if let Some(driver) = global_driver.borrow(cs).borrow_mut().as_mut() {
@@ -157,7 +160,7 @@ pub fn global_ask_timer_tick<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// - [`AskDriver::receive()`]
 #[cfg(not(feature = "std"))]
 pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
-    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    global_driver: &'static AskDriverMutex<TX, RX, PTT>,
 ) -> Option<Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>> {
     critical_section::with(|cs| {
         let mut guard = global_driver.borrow(cs).borrow_mut();
@@ -214,7 +217,7 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// - [`AskDriver::receive()`]
 #[cfg(feature = "std")]
 pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
-    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    global_driver: &'static AskDriverMutex<TX, RX, PTT>,
 ) -> Option<Vec<u8>> {
     critical_section::with(|cs| {
         let mut guard = global_driver.borrow(cs).borrow_mut();
@@ -279,7 +282,7 @@ pub fn receive_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// - [`AskDriver::send()`]
 #[cfg(not(feature = "std"))]
 pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
-    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    global_driver: &'static AskDriverMutex<TX, RX, PTT>,
     msg: Vec<u8, ASK_MAX_MESSAGE_LEN_USIZE>,
 ) -> bool {
     critical_section::with(|cs| {
@@ -339,7 +342,7 @@ pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
 /// - [`AskDriver::send()`]
 #[cfg(feature = "std")]
 pub fn send_from_global_ask<TX: OutputPin, RX: InputPin, PTT: OutputPin>(
-    global_driver: &'static Mutex<RefCell<Option<AskDriver<TX, RX, PTT>>>>,
+    global_driver: &'static AskDriverMutex<TX, RX, PTT>,
     msg: Vec<u8>,
 ) -> bool {
     critical_section::with(|cs| {
